@@ -1,0 +1,170 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/profb/Dropbox/UofT/Courses/ece241_24/Labs/Lab7_2023/play/ModelSim
+vhex7seg
+Z1 !s110 1730211765
+!i10b 1
+!s100 ne<FSjVz_l[V=B1Jn:Cbe0
+I10?T8m3E8i4`M^W1WIFUz2
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+R0
+Z3 w1730211562
+Z4 8../vga_demo.v
+Z5 F../vga_demo.v
+L0 76
+Z6 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z7 !s108 1730211765.000000
+Z8 !s107 ../vga_adapter/vga_pll.v|../vga_adapter/vga_controller.v|../vga_adapter/vga_address_translator.v|../vga_adapter/vga_adapter.v|../vga_demo.v|
+Z9 !s90 -reportprogress|300|../vga_demo.v|../vga_adapter/vga_adapter.v|../vga_adapter/vga_address_translator.v|../vga_adapter/vga_controller.v|../vga_adapter/vga_pll.v|
+!i113 1
+Z10 tCvgOpt 0
+vregn
+R1
+!i10b 1
+!s100 eo]66=CPXX2ET2CdHS8T[3
+IZjcTBeh7<JSaj2<Lo7?HK1
+R2
+R0
+R3
+R4
+R5
+L0 63
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vtestbench
+R1
+!i10b 1
+!s100 FP`5nVN``BMW7N;HZTU@80
+I4oD4Rjdg0bVoGn9<R]H2@2
+R2
+R0
+w1730177987
+8testbench.v
+Ftestbench.v
+L0 3
+R6
+r1
+!s85 0
+31
+R7
+!s107 testbench.v|
+!s90 -reportprogress|300|testbench.v|
+!i113 1
+R10
+vvga_adapter
+R1
+!i10b 1
+!s100 7KR=8CAUOI3dU[Wldj_DZ2
+I:g9eeSE^;=g6mOEhT^R@d1
+R2
+R0
+w1730178310
+8../vga_adapter/vga_adapter.v
+F../vga_adapter/vga_adapter.v
+L0 51
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vvga_address_translator
+R1
+!i10b 1
+!s100 C0DfW0_9[5co`@boeR]Pi1
+I?Q@JOgk]Bc9AlPBHeDF221
+R2
+R0
+Z11 w1729783923
+8../vga_adapter/vga_address_translator.v
+F../vga_adapter/vga_address_translator.v
+L0 4
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vvga_controller
+R1
+!i10b 1
+!s100 ejdRBhaHBe8PnOV9UFIVf2
+IgjX;<0RkHEiUm^BREgP>Y2
+R2
+R0
+w1730179634
+8../vga_adapter/vga_controller.v
+F../vga_adapter/vga_controller.v
+L0 8
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vvga_demo
+R1
+!i10b 1
+!s100 PZEl?l^V?XgB`Wc6ILm?;2
+I9RR?UbQQSgnE5BV0<z[F]2
+R2
+R0
+R3
+R4
+R5
+L0 10
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vvga_pll
+R1
+!i10b 1
+!s100 4XSTjD`VEiamX^n1@5J`b3
+IiS55lg7TQ1f5@h1imQboh3
+R2
+R0
+R11
+8../vga_adapter/vga_pll.v
+F../vga_adapter/vga_pll.v
+L0 36
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
