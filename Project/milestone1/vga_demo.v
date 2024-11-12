@@ -1,7 +1,7 @@
 /*
 *   This code draws a horizontal line on the screen and then moves the line up and down. The
 *   line "bounces" off the top and bottom of the screen and reverses directions. To run the demo
-*   first press/release KEY[0] to reset the circuit. Then, press/release KEY[1] to initialize
+*   first press/release SW[9] to reset the circuit. Then, press/release SW[8] to initialize
 *   the (x,y) location of the line. The line color is determined by SW[2:0]. Finally, press 
 *   KEY[3] to start the animation. 
 */
@@ -12,47 +12,54 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter E = 3'b100, F = 3'b101, G = 3'b110, H = 3'b111; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
-	 parameter XDIM = 10, YDIM = 10;
+    parameter XDIM = 10, YDIM = 10;
 
     parameter X0 = 8'd39, Y0 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
-	input CLOCK_50;	
-	input [9:0] SW;
-	input [3:0] KEY;
-	output [7:0] VGA_R;
-	output [7:0] VGA_G;
-	output [7:0] VGA_B;
-	output VGA_HS;
-	output VGA_VS;
-	output VGA_BLANK_N;
-	output VGA_SYNC_N;
-	output VGA_CLK;	
+    input CLOCK_50;	
+    input [9:0] SW;
+    input [3:0] KEY;
+    output [7:0] VGA_R;
+    output [7:0] VGA_G;
+    output [7:0] VGA_B;
+    output VGA_HS;
+    output VGA_VS;
+    output VGA_BLANK_N;
+    output VGA_SYNC_N;
+    output VGA_CLK;	
 
-	wire [7:0] VGA_X; 
-	wire [6:0] VGA_Y;  
-	reg [2:0] VGA_COLOR;
+    wire [7:0] VGA_X; 
+    wire [6:0] VGA_Y;  
+    reg [2:0] VGA_COLOR;
     reg plot;
-    
-	wire [2:0] colour;
-	wire [7:0] X;
-	wire [6:0] Y;
+
+    wire [7:0] Xapple;
+    wire [6:0] Yapple; 
+
+    assign Xapple = 8'd80;
+    assign Yapple = 7'd60; 
+
+
+    wire [2:0] colour;
+    wire [7:0] X;
+    wire [6:0] Y;
     wire [7:0] XC;
     wire [6:0] YC;
     wire [K-1:0] slow;
     wire go, sync;
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
 	 
-	 // added
-	 wire Xdir;
-    wire Ydir;
+    // added
+	reg Xdir;
+    reg Ydir;
 
-    wire horizontal_move;
+    reg move_left, move_up, move_down, move_right;
 
     // wire horizontal_move;
-    // assign horizontal_move = 1'b1;
-	 
+
+    // wire startMove;
 
     reg Tdir_X;
     reg Tdir_Y;
@@ -60,37 +67,43 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 	
 	assign colour = SW[2:0];
 
-    UpDn_count U1 (Y0, CLOCK_50, KEY[0], Ey, ~KEY[1], Ydir, Y);
+    UpDn_count U1 (Y0, CLOCK_50, SW[9], Ey, ~SW[8], Ydir, Y); // Sw[9] reset Sw[8] load
         defparam U1.n = 7;
 
-    // regn U2 (X0, KEY[0], ~KEY[1], CLOCK_50, X);
-    //     defparam U2.n = 8;
-
-    UpDn_count U2 (X0, CLOCK_50, KEY[0], Ex, ~KEY[1], Xdir, X);
+    UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
 
-    UpDn_count U3 (8'd0, CLOCK_50, KEY[0], Exc, Lxc, 1'b1, XC);
+    UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);
         defparam U3.n = 8;
-    UpDn_count U4 (7'd0, CLOCK_50, KEY[0], Eyc, Lyc, 1'b1, YC);
+    UpDn_count U4 (7'd0, CLOCK_50, SW[9], Eyc, Lyc, 1'b1, YC);
         defparam U4.n = 7;
 
-    UpDn_count U5 ({K{1'b0}}, CLOCK_50, KEY[0], 1'b1, 1'b0, 1'b1, slow);
+    UpDn_count U5 ({K{1'b0}}, CLOCK_50, SW[9], 1'b1, 1'b0, 1'b1, slow);
         defparam U5.n = K;
     assign sync = (slow == 0);
 
-	
-    ToggleFF U6 (Tdir_Y, KEY[0], CLOCK_50, Ydir);
-    ToggleFF U7 (Tdir_X, KEY[0], CLOCK_50, Xdir);
+    // movement
+    always @ (*)
+    begin
+        // Direction control based on key inputs
+    if (~KEY[0]) // Move Right
+        begin
+            move_right = 1'b1; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
+        end
+    else if (~KEY[1]) // Move Down
+        begin
+            move_right = 1'b0; move_down = 1'b1; move_up = 1'b0; move_left = 1'b0;
+        end
+    else if (~KEY[2]) // Move Up
+        begin
+            move_right = 1'b0; move_down = 1'b0; move_up = 1'b1; move_left = 1'b0;
+        end
+    else if (~KEY[3]) // Move Left
+        begin
+            move_right = 1'b0; move_down = 1'b0; move_up = 1'b0; move_left = 1'b1;
+        end
+    end
 
-    ToggleFF U8 (1'b1, KEY[0], ~KEY[2], horizontal_move); 
-
-    // always @(posedge CLOCK_50)
-    // begin
-    //     if (horizontal_move)
-    //     Ey <= 1'b0;
-    //     else
-    //     Ex <= 1'b0;
-    // end
 
 
     // FSM state table
@@ -108,8 +121,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
                 else Y_D = G;
-            G:  Y_D = H;
-            H:  Y_D = B;
+            G:  Y_D = H; // edge detection
+            H:  Y_D = B; // move
         endcase
 
 
@@ -129,22 +142,61 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             F:  begin Lxc = 1'b1; Eyc = 1'b1; end
             G:  begin 
                 Lyc = 1'b1; 
-                Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
-                Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
+                // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
+                // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
+
+                // Adjust Tdir_X and Tdir_Y based on the active direction flags
+                // if (move_right)
+                //     Tdir_X = (X < XSCREEN - XDIM) ? 1'b1 : 1'b0; // Move right, stop at screen edge
+                // else if (move_left)
+                //     Tdir_X = (X > 0) ? 1'b0 : 1'b1; // Move left, stop at screen edge
+                // else
+                //     Tdir_X = 1'b0; // Default to no horizontal movement
+
+                // if (move_down)
+                //     Tdir_Y = (Y < YSCREEN - YDIM) ? 1'b1 : 1'b0; // Move down, stop at screen edge
+                // else if (move_up)
+                //     Tdir_Y = (Y > 0) ? 1'b0 : 1'b1; // Move up, stop at screen edge
+                // else
+                //     Tdir_Y = 1'b0; // Default to no vertical movement
             end
 
             H:  
             begin
-            if (horizontal_move)
+            if (move_left)
+				begin
                 Ex <= 1'b1;
-            else
+                Xdir = 1'b0;
+				end
+            else if (move_up)
+				begin
                 Ey <= 1'b1;
+                Ydir = 1'b0;
+				end
+            else if (move_down)
+				begin
+                Ey <= 1'b1;
+                Ydir = 1'b1;
+				end
+            else if (move_right)
+				begin
+                Ex <= 1'b1;
+                Xdir = 1'b1;
+                end
+
+            // Draw the stationary square (fixed position)
+            if (VGA_X >= Xapple && VGA_X < Xapple + XDIM && VGA_Y >= Yapple && VGA_Y < Yapple + YDIM) 
+            begin
+                plot = 1'b1;          // enable plotting
+                VGA_COLOR = 3'b100;   // Set the color for the stationary square
+            end
+
             end
         endcase
     end
 
     always @(posedge CLOCK_50)
-        if (!KEY[0])
+        if (!SW[9])
             y_Q <= 1'b0;
         else
             y_Q <= Y_D;
@@ -155,7 +207,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     assign VGA_Y = Y + YC;
     // connect to VGA controller
     vga_adapter VGA (
-			.resetn(KEY[0]),
+			.resetn(SW[9]),
 			.clock(CLOCK_50),
 			.colour(VGA_COLOR),
 			.x(VGA_X),

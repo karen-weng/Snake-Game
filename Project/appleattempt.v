@@ -10,7 +10,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 	
     parameter A = 3'b0000, B = 3'b0001, C = 3'b0010, D = 3'b0011; 
     parameter E = 3'b0100, F = 3'b0101, G = 3'b0110, H = 3'b0111; 
-	 parameter BB = 3'b1000, CC = 3'b1001, DD = 3'b1010; 
+	parameter BB = 3'b1000, CC = 3'b1001, DD = 3'b1010; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
