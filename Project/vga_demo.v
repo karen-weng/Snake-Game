@@ -149,7 +149,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             F:  if (YC != YDIM-1) Y_D = E;
                 else Y_D = G;
             G:  Y_D = H; // edge detection
-            H:  Y_D = B; // move
+            H:  Y_D = BB; // move
         endcase
 
 
