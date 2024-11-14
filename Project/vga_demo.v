@@ -285,8 +285,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // assign VGA_X = Xdraw + XCdraw;
     // assign VGA_Y = Ydraw + YCdraw;
 
-    assign VGA_X = (y_Q == BB) ? XApple + XCApple : X + XC;
-    assign VGA_Y = (y_Q == BB) ? YApple + YCApple : Y + YC;
+    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : (X + XC);
+    assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : (Y + YC);
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),
