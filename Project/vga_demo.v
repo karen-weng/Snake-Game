@@ -92,7 +92,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     UpDn_count U4 (7'd0, CLOCK_50, SW[9], Eyc, Lyc, 1'b1, YC);
         defparam U4.n = 7;
 		  
-	 UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
+	UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
         defparam U6.n = 8;
     UpDn_count U7 (7'd0, CLOCK_50, SW[9], EycApple, LycApple, 1'b1, YCApple);
         defparam U7.n = 7;
@@ -128,19 +128,22 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @ (*)
         case (y_Q)
             A:  if (!go || !sync) Y_D = A;
+                else Y_D = BB;
+
+            BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
+                else Y_D = CC;
+            CC:  if (YCApple != YDIM-1) Y_D = BB;
                 else Y_D = B;
+
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
                 else Y_D = D;
             D:  if (!sync) Y_D = D;
-                else Y_D = BB;
-            BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
-                else Y_D = CC;
-            CC:  if (YCApple != YDIM-1) Y_D = BB;
-                else Y_D = DD;
-            DD:  if (!sync) Y_D = DD;
                 else Y_D = E;
+            
+            // DD:  if (!sync) Y_D = DD;
+            //     else Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
@@ -156,34 +159,25 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         // default assignments
         Lxc = 1'b0; Lyc = 1'b0; Exc = 1'b0; Eyc = 1'b0; VGA_COLOR = colour; plot = 1'b0;
         Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
-		  ExcApple = 1'b0; EycApple = 1'b0;
+		ExcApple = 1'b0; EycApple = 1'b0;
+        LxcApple = 1'b0; LycApple = 1'b0;
 
         case (y_Q)
-            A:  begin Lxc = 1'b1; Lyc = 1'b1; end
-            B:  begin 
-				Exc = 1'b1; 
-				plot = 1'b1; 
-				Xdraw = X;
-				XCdraw = XC;
-				Ydraw = Y;
-				YCdraw = YC;
-				end   // color a pixel
-            C:  begin 
-				Lxc = 1'b1; 
-				Eyc = 1'b1; 
-				
-				end
+            A:  begin 
+                Lxc = 1'b1; 
+                Lyc = 1'b1; 
+                LxcApple = 1'b1; 
+                LycApple = 1'b1;
+                end
 
-            D:  LxcApple = 1'b1; 
-				
-			BB:  begin 
+            BB:  begin 
 				ExcApple = 1'b1; 
 				plot = 1'b1; 
 				VGA_COLOR = 3'b100; 
-				Xdraw = XApple;
-				XCdraw = XCApple;
-				Ydraw = YApple;
-				YCdraw = YCApple;
+				// Xdraw = XApple;
+				// XCdraw = XCApple;
+				// Ydraw = YApple;
+				// YCdraw = YCApple;
 				end // color a pixel
 				
             CC:  begin 
@@ -191,21 +185,40 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				EycApple = 1'b1; 
 				// VGA_COLOR = 3'b100; 
 				end
+
+            B:  begin 
+				Exc = 1'b1; 
+				plot = 1'b1; 
+				// Xdraw = X;
+				// XCdraw = XC;
+				// Ydraw = Y;
+				// YCdraw = YC;
+				end   // color a pixel
+            C:  begin 
+				Lxc = 1'b1; 
+				Eyc = 1'b1; 
 				
-            DD:  Lyc = 1'b1;
+				end
+
+            D:  Lyc = 1'b1;
+            // Lxc = 1'b1; 
+				
+            // DD:  Lyc = 1'b1;
 				
             E:  begin 
 				Exc = 1'b1; 
 				VGA_COLOR = ALT; 
 				plot = 1'b1; 
-				Xdraw = X;
-				XCdraw = XC;
-				Ydraw = Y;
-				YCdraw = YC;
+				// Xdraw = X;
+				// XCdraw = XC;
+				// Ydraw = Y;
+				// YCdraw = YC;
 				end   // color a pixel
             F:  begin Lxc = 1'b1; Eyc = 1'b1; end
             G:  begin 
                 Lyc = 1'b1; 
+                LxcApple = 1'b1; 
+
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
                 // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
 
@@ -262,8 +275,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     assign go = ~KEY[3];
 
-    assign VGA_X = Xdraw + XCdraw;
-    assign VGA_Y = Ydraw + YCdraw;
+    // assign VGA_X = Xdraw + XCdraw;
+    // assign VGA_Y = Ydraw + YCdraw;
+
+    assign VGA_X = (y_Q == BB) ? Xapple + XCApple : X + XC;
+    assign VGA_Y = (y_Q == BB) ? Yapple + YCApple : Y + YC;
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),

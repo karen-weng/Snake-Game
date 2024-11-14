@@ -231,8 +231,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     assign go = ~KEY[3];
 
-    assign VGA_X = X + XC;
-    assign VGA_Y = Y + YC;
+    // assign VGA_X = X + XC;
+    // assign VGA_Y = Y + YC;
+
+    assign VGA_X = (y_Q == BB) ? Xapple + XCApple : X + XC;
+    assign VGA_Y = (y_Q == BB) ? Yapple + YCApple : Y + YC;
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),
