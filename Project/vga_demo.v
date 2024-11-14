@@ -15,8 +15,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-	 parameter Xapple0 = 8'd80;
-    parameter Yapple0 = 7'd60;
+	 parameter XApple0 = 8'd80;
+    parameter YApple0 = 7'd60;
 	 
     parameter X0 = 8'd39, Y0 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
@@ -278,8 +278,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // assign VGA_X = Xdraw + XCdraw;
     // assign VGA_Y = Ydraw + YCdraw;
 
-    assign VGA_X = (y_Q == BB) ? Xapple + XCApple : X + XC;
-    assign VGA_Y = (y_Q == BB) ? Yapple + YCApple : Y + YC;
+    assign VGA_X = (y_Q == BB) ? XApple + XCApple : X + XC;
+    assign VGA_Y = (y_Q == BB) ? YApple + YCApple : Y + YC;
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),
@@ -383,5 +383,9 @@ module hex7seg (hex, display);
             4'hF: display = 7'b0001110;
         endcase
 endmodule
+
+
+
+
 
 
