@@ -127,7 +127,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // FSM state table
     always @ (*)
         case (y_Q)
-            A:  if (!go || !sync) Y_D = A;
+            // A:  if (!go || !sync) Y_D = A;
+            A:  if (SW[7] || !sync) Y_D = A;
+
                 else Y_D = BB;
 
             BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
@@ -214,7 +216,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				// Ydraw = Y;
 				// YCdraw = YC;
 				end   // color a pixel
-                
+
             F:  begin 
                 Lxc = 1'b1; 
                 Eyc = 1'b1; 
