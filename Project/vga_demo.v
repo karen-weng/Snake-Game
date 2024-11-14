@@ -8,9 +8,9 @@
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK);
 	
-    parameter A = 3'b0000, B = 3'b0001, C = 3'b0010, D = 3'b0011; 
-    parameter E = 3'b0100, F = 3'b0101, G = 3'b0110, H = 3'b0111; 
-	 parameter BB = 3'b1000, CC = 3'b1001, DD = 3'b1010; 
+    parameter A = 4'b0000, B = 4'b0001, C = 4'b0010, D = 4'b0011; 
+    parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
+	 parameter BB = 4'b1000, CC = 4'b1001, DD = 4'b1010; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
