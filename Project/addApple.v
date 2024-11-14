@@ -8,16 +8,16 @@
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK);
 	
-    parameter A = 3'b0000, B = 3'b0001, C = 3'b0010, D = 3'b0011; 
-    parameter E = 3'b0100, F = 3'b0101, G = 3'b0110, H = 3'b0111; 
-	 parameter BB = 3'b1000, CC = 3'b1001, DD = 3'b1010; 
+    parameter A = 4'b0000, B = 4'b0001, C = 4'b0010, D = 4'b0011; 
+    parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
+    parameter BB = 4'b1000, CC = 4'b1001, DD = 4'b1010; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-	 parameter XApple0 = 8'd80;
+    parameter XApple0 = 8'd80;
     parameter YApple0 = 7'd60;
-	 
+        
     parameter X0 = 8'd39, Y0 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
@@ -38,9 +38,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [6:0] VGA_Y;  
     reg [2:0] VGA_COLOR;
     reg plot;
-	 
-	 reg [7:0] Xdraw, XCdraw;
-	 reg [6:0] Ydraw, YCdraw;
+        
+    reg [7:0] Xdraw, XCdraw;
+    reg [6:0] Ydraw, YCdraw;
 	 
     wire [2:0] colour;
     wire [7:0] X;
@@ -50,19 +50,19 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [K-1:0] slow;
     wire go, sync;
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
-	 
+        
     wire [7:0] XApple;
     wire [6:0] YApple;
 
-	assign XApple = 8'd30;
+    assign XApple = 8'd30;
     assign YApple = 7'd30;
-	 
-	wire [7:0] XCApple;
+        
+    wire [7:0] XCApple;
     wire [6:0] YCApple;
     reg LxcApple, LycApple, ExcApple, EycApple;
-	 
+        
     // added
-	reg Xdir;
+    reg Xdir;
     reg Ydir;
 
     reg move_left, move_up, move_down, move_right;
@@ -71,8 +71,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg Tdir_X;
     reg Tdir_Y;
     reg [2:0] y_Q, Y_D;
-	
-	assign colour = SW[2:0];
+
+    assign colour = SW[2:0];
 
     UpDn_count U1 (Y0, CLOCK_50, SW[9], Ey, ~SW[8], Ydir, Y); // Sw[9] reset Sw[8] load
         defparam U1.n = 7;
@@ -80,19 +80,19 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
 		  
-   // UpDn_count U8 (Yapple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YApple); // Sw[9] reset Sw[8] load
-//defparam U8.n = 7;
-//
- //   UpDn_count U9 (Xapple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XApple);
-//defparam U9.n = 8;
+    UpDn_count U8 (YApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YApple); // Sw[9] reset Sw[8] load
+        defparam U8.n = 7;
+
+    UpDn_count U9 (XApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XApple);
+        defparam U9.n = 8;
 
 
     UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);
         defparam U3.n = 8;
     UpDn_count U4 (7'd0, CLOCK_50, SW[9], Eyc, Lyc, 1'b1, YC);
         defparam U4.n = 7;
-		  
-	UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
+            
+    UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
         defparam U6.n = 8;
     UpDn_count U7 (7'd0, CLOCK_50, SW[9], EycApple, LycApple, 1'b1, YCApple);
         defparam U7.n = 7;
@@ -127,7 +127,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // FSM state table
     always @ (*)
         case (y_Q)
-            A:  if (!go || !sync) Y_D = A;
+            // A:  if (!go || !sync) Y_D = A;
+            A:  if (SW[7] || !sync) Y_D = A;
+
                 else Y_D = BB;
 
             BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
@@ -141,7 +143,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = D;
             D:  if (!sync) Y_D = D;
                 else Y_D = E;
-            
+
             // DD:  if (!sync) Y_D = DD;
             //     else Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
@@ -172,8 +174,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             BB:  begin 
 				ExcApple = 1'b1; 
-				plot = 1'b1; 
 				VGA_COLOR = 3'b100; 
+                plot = 1'b1; 
 				// Xdraw = XApple;
 				// XCdraw = XCApple;
 				// Ydraw = YApple;
@@ -214,7 +216,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				// Ydraw = Y;
 				// YCdraw = YC;
 				end   // color a pixel
-            F:  begin Lxc = 1'b1; Eyc = 1'b1; end
+
+            F:  begin 
+                Lxc = 1'b1; 
+                Eyc = 1'b1; 
+                end
+
             G:  begin 
                 Lyc = 1'b1; 
                 LxcApple = 1'b1; 
@@ -273,13 +280,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         else
             y_Q <= Y_D;
 
-    assign go = ~KEY[3];
+    assign go = ~SW[7];
 
     // assign VGA_X = Xdraw + XCdraw;
     // assign VGA_Y = Ydraw + YCdraw;
 
-    assign VGA_X = (y_Q == BB) ? XApple + XCApple : X + XC;
-    assign VGA_Y = (y_Q == BB) ? YApple + YCApple : Y + YC;
+    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : (X + XC);
+    assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : (Y + YC);
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),
