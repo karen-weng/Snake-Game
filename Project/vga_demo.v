@@ -54,15 +54,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [7:0] XApple;
     wire [6:0] YApple;
 
-	assign XApple = 8'd80;
-    assign YApple = 7'd60;
+	assign XApple = 8'd30;
+    assign YApple = 7'd30;
 	 
-	 wire [7:0] XCApple;
+	wire [7:0] XCApple;
     wire [6:0] YCApple;
     reg LxcApple, LycApple, ExcApple, EycApple;
 	 
     // added
-		reg Xdir;
+	reg Xdir;
     reg Ydir;
 
     reg move_left, move_up, move_down, move_right;
