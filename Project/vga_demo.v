@@ -70,7 +70,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg Tdir_X;
     reg Tdir_Y;
-    reg [2:0] y_Q, Y_D;
+    reg [3:0] y_Q, Y_D;
 
     assign colour = SW[2:0];
 
