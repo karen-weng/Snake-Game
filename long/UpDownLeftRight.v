@@ -361,6 +361,7 @@ module shift_register_move_snake (clk, enable, data, data_in, data_out);
     output reg [ n * maxLength-1 :0 ] data_out;
 
     parameter n = 8;
+    parameter maxLength = 4;
 
     always @(posedge clk) 
     begin

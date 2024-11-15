@@ -224,7 +224,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             G:  begin 
                 Lyc = 1'b1; 
-                LxcApple = 1'b1; 
+                LycApple = 1'b1; 
 
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
                 // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
@@ -286,8 +286,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // assign VGA_X = Xdraw + XCdraw;
     // assign VGA_Y = Ydraw + YCdraw;
 
-    assign VGA_X = (y_Q == BB || y_Q == CC) ? (XApple + XCApple) : (X + XC);
-    assign VGA_Y = (y_Q == BB || y_Q == BB) ? (YApple + YCApple) : (Y + YC);
+    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : (X + XC);
+    assign VGA_Y = (y_Q == BB ) ? (YApple + YCApple) : (Y + YC);
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),
