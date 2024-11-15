@@ -101,8 +101,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     assign sync = (slow == 0);
 
 
-    UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
-        defparam U6.n = 1;
+    // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
+    //     defparam U6.n = 2;
 
     // movement
     always @ (*)
