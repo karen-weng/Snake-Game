@@ -9,8 +9,8 @@ module top(CLOCK_50, SW, KEY);
     wire [6:0] YC;
 
     wire MaxLength = 5;
-    wire [8*MaxLength - 1:0] XSnakeLong;
-    wire [7* MaxLength - 1:0] YSnakeLong;
+    wire [8 * MaxLength - 1:0] XSnakeLong;
+    wire [7 * MaxLength - 1:0] YSnakeLong;
 
     shift_register_move_snake S0 (CLOCK_50, SW[9], maxLength, XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
