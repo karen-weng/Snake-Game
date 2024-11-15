@@ -67,12 +67,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [7 * maxLength - 1:0] YSnakeLong;
     reg Ebodycounter;
 
-    initial begin
-        for (i = 0; i < maxLength; i = i + 1) begin
-            XSnakeLong[i * 8 +: 8] = X0 - (i * XDIM); // X coordinates, evenly spaced
-            YSnakeLong[i * 7 +: 7] = Y0;             // Same Y coordinate
-        end
-    end
+    // initial begin
+    //     for (i = 0; i < maxLength; i = i + 1) begin
+    //         XSnakeLong[i * 8 +: 8] = X0 - (i * XDIM); // X coordinates, evenly spaced
+    //         YSnakeLong[i * 7 +: 7] = Y0;             // Same Y coordinate
+    //     end
+    // end
 
     shift_register_move_snake S0 (CLOCK_50, SW[9], maxLength, XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
