@@ -2,10 +2,13 @@
 
 module testbench ( );
 
+// CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
+// 				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK
+
 	parameter CLOCK_PERIOD = 20; // clock 50
 
-    reg [2:0] SW;
-    reg [1:0] KEY;
+    reg [9:0] SW;
+    reg [3:0] KEY;
     reg CLOCK_50;
     wire [9:0] LEDR;
 

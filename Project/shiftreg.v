@@ -1,3 +1,5 @@
+
+
 module shift_register_move_snake (clk, enable, maxLength, data, data_in, data_out);
     input clk;
     input enable;
