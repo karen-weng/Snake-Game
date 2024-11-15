@@ -15,6 +15,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter XDIM = 10, YDIM = 10;
 
     parameter X0 = 8'd39, Y0 = 7'd59;
+    parameter X1 = 8'd59, Y1 = 7'd59;
+    parameter X2 = 8'd79, Y2 = 7'd59;
+    parameter X3 = 8'd99, Y2 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -57,12 +60,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg move_left, move_up, move_down, move_right;
 
-
-    parameter maxLength = 2;
+    parameter maxLength = 4;
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg [1:0] drawBodyCount; 
+    reg drawBodyCount; 
     wire [8 * maxLength - 1:0] XSnakeLong;
     wire [7 * maxLength - 1:0] YSnakeLong;
     reg Ebodycounter;
@@ -90,6 +92,29 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
+
+
+
+    UpDn_count U22 (Y1, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[7 * 3 - 1 : 7 * 3 - 1 - 7]); // Sw[9] reset Sw[8] load
+        defparam U22.n = 7;
+
+    UpDn_count U33 (X1, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[8 * 3 - 1 : 8 * 3 - 1 - 8]);
+        defparam U33.n = 8;
+
+    UpDn_count U44 (Y2, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[7 * 2 - 1 : 7 * 2 - 1 - 7]); // Sw[9] reset Sw[8] load
+        defparam U44.n = 7;
+
+    UpDn_count U55 (X2, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[8 * 2 - 1 : 8 * 2 - 1 - 8]);
+        defparam U55.n = 8;
+
+    UpDn_count U66 (Y3, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[7 * 1 - 1 : 7 * 1 - 1 - 7]); // Sw[9] reset Sw[8] load
+        defparam U66.n = 7;
+
+    UpDn_count U77 (X3, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[8 * 1 - 1 : 8 * 1 - 1 - 8]);
+        defparam U77.n = 8;
+
+
+
 
     UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);
         defparam U3.n = 8;
@@ -185,11 +210,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             H:  
             begin
-            if (drawBodyCount != 2'b0)
+            if (drawBodyCount != 0)
                 drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
             else
                 begin
-                drawBodyCount <= 2'b11;
+                drawBodyCount <= 4;
 
                 if (move_left)
                     begin
@@ -236,8 +261,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg [7:0] VGA_X_reg, VGA_Y_reg;
 
     always @(*) begin
-        VGA_X_reg = XSnakeLong[8 * drawBodyCount +: 8] + XC;  // Dynamic part-select
-        VGA_Y_reg = YSnakeLong[7 * drawBodyCount +: 7] + YC;  // Dynamic part-select
+        VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
+        VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
     end
 
     assign VGA_X = VGA_X_reg;
