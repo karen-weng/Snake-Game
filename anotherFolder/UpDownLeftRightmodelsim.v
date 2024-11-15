@@ -51,6 +51,16 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire go, sync;
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
 	 
+
+    wire MaxLength = 5;
+    wire [8*MaxLength - 1:0] XSnakeLong;
+    wire [7* MaxLength - 1:0] YSnakeLong;
+
+    shift_register_move_snake S0 (CLOCK_50, SW[9], maxLength, XSnakeLong, X, XSnakeLong);
+        defparam S0.n = 8; 
+    shift_register_move_snake S1 (CLOCK_50, SW[9], maxLength, YSnakeLong, Y, YSnakeLong);
+        defparam S0.n = 7; 
+
     // added
 	reg Xdir;
     reg Ydir;
@@ -309,3 +319,34 @@ module hex7seg (hex, display);
         endcase
 endmodule
 
+module ifhit (X1, X2, Y1, Y2, XDIM, YDIM, hit, enable, CLOCK_50)
+    input [7:0] X1, X2;
+	input [6:0] Y1, Y2;
+    input XDIM, YDIM;
+    output hit;
+
+    assign hit = (X1 < X2 + XDIM) && (X1 + XDIM > X2) &&
+                 (Y1 < Y2 + YDIM) && (Y1 + YDIM > Y2);
+
+endmodule 
+
+module shift_register_move_snake (clk, enable, maxLength, data, data_in, data_out);
+    input clk;
+    input enable;
+    input maxLength; 
+    input [ n * maxLength-1 :0 ] data;
+    input [ n-1 :0 ] data_in;
+    output reg [ n * maxLength-1 :0 ] data_out;
+
+    parameter n = 8;
+
+    always @(posedge clk) 
+    begin
+        if (enable) begin
+            // left is the head
+            // add new data to the front the rest follows
+            data_out <= {data_in, data[n * maxLength-1 : n-1 ]};
+        end
+    end
+
+endmodule

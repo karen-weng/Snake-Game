@@ -80,11 +80,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
 		  
-    UpDn_count U8 (YApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YApple); // Sw[9] reset Sw[8] load
-        defparam U8.n = 7;
+    // UpDn_count U8 (YApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YApple); // Sw[9] reset Sw[8] load
+    //     defparam U8.n = 7;
 
-    UpDn_count U9 (XApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XApple);
-        defparam U9.n = 8;
+    // UpDn_count U9 (XApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XApple);
+    //     defparam U9.n = 8;
 
 
     UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);

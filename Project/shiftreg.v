@@ -1,9 +1,10 @@
-module shift_register_move_snake (clk, enable, maxLength, data_in, data_out);
+module shift_register_move_snake (clk, enable, maxLength, data, data_in, data_out);
     input clk;
     input enable;
     input maxLength; 
+    input [ n * maxLength-1 :0 ] data;
     input [ n-1 :0 ] data_in;
-    output reg [ n * maxLength-1 :0 ] data_out
+    output reg [ n * maxLength-1 :0 ] data_out;
 
     parameter n = 8;
 
@@ -12,7 +13,7 @@ module shift_register_move_snake (clk, enable, maxLength, data_in, data_out);
         if (enable) begin
             // left is the head
             // add new data to the front the rest follows
-            data_out <= {data_in, data_out[n * maxLength-1 : n-1 ]};
+            data_out <= {data_in, data[n * maxLength-1 : n-1 ]};
         end
     end
 
