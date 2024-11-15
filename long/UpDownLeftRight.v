@@ -58,9 +58,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg move_left, move_up, move_down, move_right;
 
 
+    parameter maxLength = 2;
+    // wire maxLength;
+    // assign maxLength = 2;
 
-    wire maxLength;
-    assign maxLength = 2;
     reg [1:0] drawBodyCount; 
     wire [8 * maxLength - 1:0] XSnakeLong;
     wire [7 * maxLength - 1:0] YSnakeLong;
@@ -231,8 +232,18 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     assign go = ~KEY[3];
 
-    assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
-    assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
+
+    reg [7:0] VGA_X_reg, VGA_Y_reg;
+
+    always @(*) begin
+        VGA_X_reg = XSnakeLong[8 * drawBodyCount +: 8] + XC;  // Dynamic part-select
+        VGA_Y_reg = YSnakeLong[7 * drawBodyCount +: 7] + YC;  // Dynamic part-select
+    end
+
+    assign VGA_X = VGA_X_reg;
+    assign VGA_Y = VGA_Y_reg;
+    // assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
+    // assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
 
 
     // connect to VGA controller
