@@ -245,6 +245,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
     // assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
 
+    // assign VGA_X = X + XC;
+    // assign VGA_Y = Y + YC;
 
     // connect to VGA controller
     vga_adapter VGA (
