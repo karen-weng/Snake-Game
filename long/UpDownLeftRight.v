@@ -74,9 +74,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //     end
     // end
 
-    shift_register_move_snake S0 (CLOCK_50, SW[9], maxLength, XSnakeLong, X, XSnakeLong);
+    shift_register_move_snake S0 (CLOCK_50, SW[9], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
-    shift_register_move_snake S1 (CLOCK_50, SW[9], maxLength, YSnakeLong, Y, YSnakeLong);
+    shift_register_move_snake S1 (CLOCK_50, SW[9], YSnakeLong, Y, YSnakeLong);
         defparam S0.n = 7; 
 
     reg Tdir_X;
@@ -350,10 +350,10 @@ module hex7seg (hex, display);
         endcase
 endmodule
 
-module shift_register_move_snake (clk, enable, maxLength, data, data_in, data_out);
+module shift_register_move_snake (clk, enable, data, data_in, data_out);
     input clk;
     input enable;
-    input maxLength; 
+    // input maxLength; 
     input [ n * maxLength-1 :0 ] data;
     input [ n-1 :0 ] data_in;
     output reg [ n * maxLength-1 :0 ] data_out;
