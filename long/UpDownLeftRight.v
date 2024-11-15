@@ -230,7 +230,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         else
             y_Q <= Y_D;
 
-    assign go = ~KEY[3];
+    assign go = ~SW[7];
 
 
     reg [7:0] VGA_X_reg, VGA_Y_reg;
