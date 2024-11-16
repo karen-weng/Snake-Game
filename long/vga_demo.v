@@ -15,9 +15,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter XDIM = 10, YDIM = 10;
 
     parameter X0 = 8'd39, Y0 = 7'd59;
-    parameter X1 = 8'd59, Y1 = 7'd59;
-    parameter X2 = 8'd79, Y2 = 7'd59;
-    parameter X3 = 8'd99, Y3 = 7'd59;
+    parameter X1 = 8'd49, Y1 = 7'd59;
+    parameter X2 = 8'd59, Y2 = 7'd59;
+    parameter X3 = 8'd69, Y3 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -76,10 +76,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //     end
     // end
 
-    shift_register_move_snake S0 (CLOCK_50, SW[9], XSnakeLong, X, XSnakeLong);
+    shift_register_move_snake S0 (CLOCK_50, SW[9], SW[8], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
-    shift_register_move_snake S1 (CLOCK_50, SW[9], YSnakeLong, Y, YSnakeLong);
+    shift_register_move_snake S1 (CLOCK_50, SW[9], SW[8], YSnakeLong, Y, YSnakeLong);
         defparam S0.n = 7; 
+        defparam S0.P0 = 8'd59;
+        defparam S0.P1 = 8'd59;
+        defparam S0.P2 = 8'd59;
+        defparam S0.P3 = 8'd59;
+
 
     reg Tdir_X;
     reg Tdir_Y;
@@ -379,20 +384,28 @@ module hex7seg (hex, display);
         endcase
 endmodule
 
-module shift_register_move_snake (clk, enable, data, data_in, data_out);
+module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     input clk;
-    input enable;
+    input enable, reset;
     // input maxLength; 
     input [ n * maxLength-1 :0 ] data;
     input [ n-1 :0 ] data_in;
     output reg [ n * maxLength-1 :0 ] data_out;
 
+    parameter [n - 1 : 0] P0 = 8'd39, 
+                          P1 = 8'd49, 
+                          P2 = 8'd59, 
+                          P3 = 8'd69;
     parameter n = 8;
     parameter maxLength = 4;
 
     always @(posedge clk) 
     begin
-        if (enable) begin
+        if (reset) begin
+            data_out <= {P0, P1, P2, P3};
+        end
+        
+        else if (enable) begin
             // left is the head
             // add new data to the front the rest follows
             data_out <= {data_in, data[n * maxLength-1 : n-1 ]};
