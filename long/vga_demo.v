@@ -8,8 +8,10 @@
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK);
 	
-    parameter A = 3'b000, B = 3'b001, C = 3'b010, D = 3'b011; 
-    parameter E = 3'b100, F = 3'b101, G = 3'b110, H = 3'b111; 
+    parameter A = 4'b0000, B = 4'b0001, C = 4'b0010, D = 4'b0011; 
+    parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
+    parameter drawed = 4'b1000, erased = 4'b1001;
+    parameter BB = 4'b1010, CC = 4'b1011; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
@@ -64,7 +66,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg [2:0] drawBodyCount; 
+    reg [3:0] drawBodyCount; 
     wire [31:0] XSnakeLong;
     wire [27:0] YSnakeLong;
 
@@ -170,23 +172,18 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
-            //    else if (drawBodyCount > 1) Y_D = B;
                 else Y_D = D;
+            drawed: if (drawBodyCount >= 1) Y_D = B;
+                    else Y_D = D;
 			D:  if (!sync) Y_D = D;
-						else if (drawBodyCount >= 1) Y_D = B;
                 else Y_D = E;
-			//	D:		Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
-         
-                else Y_D = G;
-					 
-            G:  
-				//Y_D = H; // edge detection
-					 if (drawBodyCount >= 1) Y_D = E;
-					 else Y_D = H;
-					 
+                else Y_D = G; 
+            erased: if (drawBodyCount >= 1) Y_D = E;
+                    else: Y_D = G;
+            G:  Y_D = H;	 
             H:  Y_D = B; // move
         endcase
 
@@ -202,11 +199,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             A:  begin Lxc = 1'b1; Lyc = 1'b1; end
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
             C:  begin Lxc = 1'b1; Eyc = 1'b1; end
-            D:  Lyc = 1'b1;
+            drawed: Lyc = 1'b1;
+            D:  
             E:  begin Exc = 1'b1; VGA_COLOR = ALT; plot = 1'b1; end   // color a pixel
             F:  begin Lxc = 1'b1; Eyc = 1'b1; end
+            erased: Lyc = 1'b1; 
             G:  begin 
-                Lyc = 1'b1; 
+                
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
                 // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
 
@@ -277,7 +276,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         else
             begin
             y_Q <= Y_D;
-            if ((y_Q == G && Y_D == H) || (y_Q == C && Y_D == D))
+            if ((y_Q == C && Y_D == drawed) || (y_Q == F && Y_D == erased))
                 begin
                 if (drawBodyCount > 1)  
                     drawBodyCount <= drawBodyCount - 1;
