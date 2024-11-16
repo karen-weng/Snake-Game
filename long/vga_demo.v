@@ -14,10 +14,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-    parameter X0 = 8'd39, Y0 = 7'd59;
-    parameter X1 = 8'd49, Y1 = 7'd59;
-    parameter X2 = 8'd59, Y2 = 7'd59;
-    parameter X3 = 8'd69, Y3 = 7'd59;
+    parameter X0 = 8'd00, Y0 = 7'd00;
+    parameter X1 = 8'd00, Y1 = 7'd00;
+    parameter X2 = 8'd00, Y2 = 7'd00;
+    parameter X3 = 8'd80, Y3 = 7'd60;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -190,7 +190,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
 
         case (y_Q)
-            A:  begin Lxc = 1'b1; Lyc = 1'b1; end
+            A:  begin Lxc = 1'b1; Lyc = 1'b1; drawBodyCount <= 4; end
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
             C:  begin Lxc = 1'b1; Eyc = 1'b1; end
             D:  Lyc = 1'b1;
