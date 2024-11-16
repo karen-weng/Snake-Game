@@ -17,7 +17,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter X0 = 8'd39, Y0 = 7'd59;
     parameter X1 = 8'd59, Y1 = 7'd59;
     parameter X2 = 8'd79, Y2 = 7'd59;
-    parameter X3 = 8'd99, Y2 = 7'd59;
+    parameter X3 = 8'd99, Y3 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
