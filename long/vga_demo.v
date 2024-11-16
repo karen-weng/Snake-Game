@@ -14,10 +14,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-    parameter X0 = 8'd80, Y0 = 7'd10;
+    parameter X0 = 8'd80, Y0 = 7'd30;
     parameter X1 = 8'd80, Y1 = 7'd40;
-    parameter X2 = 8'd80, Y2 = 7'd70;
-    parameter X3 = 8'd80, Y3 = 7'd100;
+    parameter X2 = 8'd80, Y2 = 7'd50;
+    parameter X3 = 8'd80, Y3 = 7'd60;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -170,17 +170,23 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
-                else if (drawBodyCount == 1) Y_D = D;
-                else Y_D = B;
+            //    else if (drawBodyCount > 1) Y_D = B;
+                else Y_D = D;
 			D:  if (!sync) Y_D = D;
+						else if (drawBodyCount >= 1) Y_D = B;
                 else Y_D = E;
 			//	D:		Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
-                else if (drawBodyCount == 1) Y_D = H;
-                else Y_D = E;
-            G:  Y_D = H; // edge detection
+         
+                else Y_D = G;
+					 
+            G:  
+				//Y_D = H; // edge detection
+					 if (drawBodyCount >= 1) Y_D = E;
+					 else Y_D = H;
+					 
             H:  Y_D = B; // move
         endcase
 
@@ -271,7 +277,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         else
             begin
             y_Q <= Y_D;
-            if (y_Q == G && Y_D == H)
+            if ((y_Q == G && Y_D == H) || (y_Q == C && Y_D == D))
                 begin
                 if (drawBodyCount > 1)  
                     drawBodyCount <= drawBodyCount - 1;
