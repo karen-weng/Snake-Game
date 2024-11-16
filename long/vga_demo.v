@@ -219,12 +219,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             H:  
             begin
-            if (drawBodyCount > 1)
-                drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
-            else
+            // if (drawBodyCount > 1)
+            //     drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
+            // else
+            //     begin
+            //     drawBodyCount <= 4;
+            if (drawBodyCount == 1)
                 begin
-                drawBodyCount <= 4;
-
                 if (move_left)
                     begin
                     Ex <= 1'b1;
