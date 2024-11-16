@@ -170,14 +170,16 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
-                else Y_D = D;
-				D:  if (!sync) Y_D = D;
+                else if (drawBodyCount == 1) Y_D = D;
+                else Y_D = B;
+			D:  if (!sync) Y_D = D;
                 else Y_D = E;
 			//	D:		Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
-                else Y_D = G;
+                else if (drawBodyCount == 1) Y_D = H;
+                else Y_D = E;
             G:  Y_D = H; // edge detection
             H:  Y_D = B; // move
         endcase
