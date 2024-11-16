@@ -15,9 +15,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter XDIM = 10, YDIM = 10;
 
     parameter X0 = 8'd39, Y0 = 7'd59;
-    parameter X1 = 8'd59, Y1 = 7'd59;
-    parameter X2 = 8'd79, Y2 = 7'd59;
-    parameter X3 = 8'd99, Y3 = 7'd59;
+    parameter X1 = 8'd49, Y1 = 7'd59;
+    parameter X2 = 8'd59, Y2 = 7'd59;
+    parameter X3 = 8'd69, Y3 = 7'd59;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -65,8 +65,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // assign maxLength = 2;
 
     reg drawBodyCount; 
-    wire [8 * maxLength - 1:0] XSnakeLong;
-    wire [7 * maxLength - 1:0] YSnakeLong;
+    wire [31:0] XSnakeLong;
+    wire [27:0] YSnakeLong;
     reg Ebodycounter;
 
     // initial begin
@@ -76,10 +76,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //     end
     // end
 
-    shift_register_move_snake S0 (CLOCK_50, SW[9], XSnakeLong, X, XSnakeLong);
+    shift_register_move_snake S0 (CLOCK_50, SW[9], SW[8], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
-    shift_register_move_snake S1 (CLOCK_50, SW[9], YSnakeLong, Y, YSnakeLong);
+    shift_register_move_snake S1 (CLOCK_50, SW[9], SW[8], YSnakeLong, Y, YSnakeLong);
         defparam S0.n = 7; 
+        defparam S0.P0 = 7'd59;
+        defparam S0.P1 = 7'd69;
+        defparam S0.P2 = 7'd79;
+        defparam S0.P3 = 7'd89;
+
 
     reg Tdir_X;
     reg Tdir_Y;
@@ -95,23 +100,23 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
 
 
-    UpDn_count U22 (Y1, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[7 * 3 - 1 : 7 * 3 - 1 - 7]); // Sw[9] reset Sw[8] load
-        defparam U22.n = 7;
+    // UpDn_count U22 (Y1, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[20 : 14]); // Sw[9] reset Sw[8] load
+    //     defparam U22.n = 7;
 
-    UpDn_count U33 (X1, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[8 * 3 - 1 : 8 * 3 - 1 - 8]);
-        defparam U33.n = 8;
+    // UpDn_count U33 (X1, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[23 : 16]);
+    //     defparam U33.n = 8;
 
-    UpDn_count U44 (Y2, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[7 * 2 - 1 : 7 * 2 - 1 - 7]); // Sw[9] reset Sw[8] load
-        defparam U44.n = 7;
+    // UpDn_count U44 (Y2, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[13 : 7]); // Sw[9] reset Sw[8] load
+    //     defparam U44.n = 7;
 
-    UpDn_count U55 (X2, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[8 * 2 - 1 : 8 * 2 - 1 - 8]);
-        defparam U55.n = 8;
+    // UpDn_count U55 (X2, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[15 : 8]);
+    //     defparam U55.n = 8;
 
-    UpDn_count U66 (Y3, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[7 * 1 - 1 : 7 * 1 - 1 - 7]); // Sw[9] reset Sw[8] load
-        defparam U66.n = 7;
+    // UpDn_count U66 (Y3, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[6:0]); // Sw[9] reset Sw[8] load
+    //     defparam U66.n = 7;
 
-    UpDn_count U77 (X3, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[8 * 1 - 1 : 8 * 1 - 1 - 8]);
-        defparam U77.n = 8;
+    // UpDn_count U77 (X3, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[7:0]);
+    //     defparam U77.n = 8;
 
 
 
@@ -379,20 +384,28 @@ module hex7seg (hex, display);
         endcase
 endmodule
 
-module shift_register_move_snake (clk, enable, data, data_in, data_out);
+module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     input clk;
-    input enable;
+    input enable, reset;
     // input maxLength; 
     input [ n * maxLength-1 :0 ] data;
     input [ n-1 :0 ] data_in;
     output reg [ n * maxLength-1 :0 ] data_out;
 
+    parameter [n - 1 : 0] P0 = 8'd39, 
+                          P1 = 8'd39, 
+                          P2 = 8'd39, 
+                          P3 = 8'd39;
     parameter n = 8;
     parameter maxLength = 4;
 
     always @(posedge clk) 
     begin
-        if (enable) begin
+        if (reset) begin
+            data_out <= {P0, P1, P2, P3};
+        end
+        
+        else if (enable) begin
             // left is the head
             // add new data to the front the rest follows
             data_out <= {data_in, data[n * maxLength-1 : n-1 ]};
@@ -400,3 +413,4 @@ module shift_register_move_snake (clk, enable, data, data_in, data_out);
     end
 
 endmodule
+
