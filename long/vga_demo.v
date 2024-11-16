@@ -94,7 +94,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg Tdir_X;
     reg Tdir_Y;
-    reg [2:0] y_Q, Y_D;
+    reg [3:0] y_Q, Y_D;
 	
 	assign colour = SW[2:0];
 
@@ -172,7 +172,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
-                else Y_D = D;
+                else Y_D = drawed;
             drawed: if (drawBodyCount >= 1) Y_D = B;
                     else Y_D = D;
 			D:  if (!sync) Y_D = D;
@@ -180,9 +180,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
-                else Y_D = G; 
+                else Y_D = erased; 
             erased: if (drawBodyCount >= 1) Y_D = E;
-                    else: Y_D = G;
+                    else Y_D = G;
             G:  Y_D = H;	 
             H:  Y_D = B; // move
         endcase
@@ -200,11 +200,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
             C:  begin Lxc = 1'b1; Eyc = 1'b1; end
             drawed: Lyc = 1'b1;
-            D:  
+           // D:  
             E:  begin Exc = 1'b1; VGA_COLOR = ALT; plot = 1'b1; end   // color a pixel
             F:  begin Lxc = 1'b1; Eyc = 1'b1; end
             erased: Lyc = 1'b1; 
-            G:  begin 
+          //  G:  begin 
                 
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
                 // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
@@ -223,7 +223,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 //     Tdir_Y = (Y > 0) ? 1'b0 : 1'b1; // Move up, stop at screen edge
                 // else
                 //     Tdir_Y = 1'b0; // Default to no vertical movement
-            end
+       //     end
 
             H:  
             begin
