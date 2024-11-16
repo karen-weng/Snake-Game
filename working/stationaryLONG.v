@@ -10,15 +10,16 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 	
     parameter A = 4'b0000, B = 4'b0001, C = 4'b0010, D = 4'b0011; 
     parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
-    parameter BB = 4'b1000, CC = 4'b1001, DD = 4'b1010; 
+    parameter drawed = 4'b1000, erased = 4'b1001;
+    parameter BB = 4'b1010, CC = 4'b1011; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-    parameter XApple0 = 8'd80;
-    parameter YApple0 = 7'd60;
-        
-    parameter X0 = 8'd39, Y0 = 7'd59;
+    parameter X0 = 8'd80, Y0 = 7'd30;
+    parameter X1 = 8'd80, Y1 = 7'd40;
+    parameter X2 = 8'd80, Y2 = 7'd50;
+    parameter X3 = 8'd80, Y3 = 7'd60;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -38,10 +39,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [6:0] VGA_Y;  
     reg [2:0] VGA_COLOR;
     reg plot;
-        
-    // reg [7:0] Xdraw, XCdraw;
-    // reg [6:0] Ydraw, YCdraw;
-	 
+
+    wire [7:0] Xapple;
+    wire [6:0] Yapple; 
+
+    assign Xapple = 8'd80;
+    assign Yapple = 7'd60; 
+
+
     wire [2:0] colour;
     wire [7:0] X;
     wire [6:0] Y;
@@ -50,56 +55,90 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [K-1:0] slow;
     wire go, sync;
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
-        
-    wire [7:0] XApple;
-    wire [6:0] YApple;
-
-    assign XApple = 8'd30;
-    assign YApple = 7'd30;
-        
-    wire [7:0] XCApple;
-    wire [6:0] YCApple;
-    reg LxcApple, LycApple, ExcApple, EycApple;
-        
+	 
     // added
-    reg Xdir;
+	 reg Xdir;
     reg Ydir;
 
     reg move_left, move_up, move_down, move_right;
+
+    parameter maxLength = 4;
+    // wire maxLength;
+    // assign maxLength = 2;
+
+    reg [3:0] drawBodyCount; 
+    wire [31:0] XSnakeLong;
+    wire [27:0] YSnakeLong;
+
+    assign XSnakeLong = {X0, X1, X2, X3};
+    assign YSnakeLong = {Y0, Y1, Y2, Y3};
+
+    reg Ebodycounter;
+
+    // initial begin
+    //     for (i = 0; i < maxLength; i = i + 1) begin
+    //         XSnakeLong[i * 8 +: 8] = X0 - (i * XDIM); // X coordinates, evenly spaced
+    //         YSnakeLong[i * 7 +: 7] = Y0;             // Same Y coordinate
+    //     end
+    // end
+
+    // shift_register_move_snake S0 (CLOCK_50, SW[9], SW[8], XSnakeLong, X, XSnakeLong);
+    //     defparam S0.n = 8; 
+    // shift_register_move_snake S1 (CLOCK_50, SW[9], SW[8], YSnakeLong, Y, YSnakeLong);
+    //     defparam S0.n = 7; 
+    //     defparam S0.P0 = 7'd59;
+    //     defparam S0.P1 = 7'd69;
+    //     defparam S0.P2 = 7'd79;
+    //     defparam S0.P3 = 7'd89;
 
 
     reg Tdir_X;
     reg Tdir_Y;
     reg [3:0] y_Q, Y_D;
+	
+	assign colour = SW[2:0];
 
-    assign colour = SW[2:0];
-
-    UpDn_count U1 (Y0, CLOCK_50, SW[9], Ey, ~SW[8], Ydir, Y); // Sw[9] reset Sw[8] load
+    UpDn_count U1 (Y0, CLOCK_50, SW[9], Ey, ~SW[8], Ydir, Y); // Sw[9] reset Sw[8] negative load
         defparam U1.n = 7;
 
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
-		  
-    // UpDn_count U8 (YApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YApple); // Sw[9] reset Sw[8] load
-    //     defparam U8.n = 7;
 
-    // UpDn_count U9 (XApple0, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XApple);
-    //     defparam U9.n = 8;
+
+
+    // UpDn_count U22 (Y1, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[20 : 14]); // Sw[9] reset Sw[8] load
+    //     defparam U22.n = 7;
+
+    // UpDn_count U33 (X1, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[23 : 16]);
+    //     defparam U33.n = 8;
+
+    // UpDn_count U44 (Y2, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[13 : 7]); // Sw[9] reset Sw[8] load
+    //     defparam U44.n = 7;
+
+    // UpDn_count U55 (X2, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[15 : 8]);
+    //     defparam U55.n = 8;
+
+    // UpDn_count U66 (Y3, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[6:0]); // Sw[9] reset Sw[8] load
+    //     defparam U66.n = 7;
+
+    // UpDn_count U77 (X3, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[7:0]);
+    //     defparam U77.n = 8;
+
+
 
 
     UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);
         defparam U3.n = 8;
     UpDn_count U4 (7'd0, CLOCK_50, SW[9], Eyc, Lyc, 1'b1, YC);
         defparam U4.n = 7;
-            
-    UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
-        defparam U6.n = 8;
-    UpDn_count U7 (7'd0, CLOCK_50, SW[9], EycApple, LycApple, 1'b1, YCApple);
-        defparam U7.n = 7;
 
     UpDn_count U5 ({K{1'b0}}, CLOCK_50, SW[9], 1'b1, 1'b0, 1'b1, slow);
         defparam U5.n = K;
     assign sync = (slow == 0);
+
+
+    // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
+    //     defparam U6.n = 2;
 
     // movement
     always @ (*)
@@ -124,34 +163,28 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     end
 
 
+
     // FSM state table
     always @ (*)
         case (y_Q)
-            // A:  if (!go || !sync) Y_D = A;
-            A:  if (SW[7] || !sync) Y_D = A;
-
-                else Y_D = BB;
-
-            BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
-                else Y_D = CC;
-            CC:  if (YCApple != YDIM-1) Y_D = BB;
+            A:  if (!go || !sync) Y_D = A;
                 else Y_D = B;
-
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
-                else Y_D = D;
-            D:  if (!sync) Y_D = D;
+                else Y_D = drawed;
+            drawed: if (drawBodyCount >= 1) Y_D = B;
+                    else Y_D = D;
+			D:  if (!sync) Y_D = D;
                 else Y_D = E;
-
-            // DD:  if (!sync) Y_D = DD;
-            //     else Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
-                else Y_D = G;
-            G:  Y_D = H; // edge detection
-            H:  Y_D = BB; // move
+                else Y_D = erased; 
+            erased: if (drawBodyCount >= 1) Y_D = E;
+                    else Y_D = G;
+            G:  Y_D = H;	 
+            H:  Y_D = B; // move
         endcase
 
 
@@ -161,71 +194,18 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         // default assignments
         Lxc = 1'b0; Lyc = 1'b0; Exc = 1'b0; Eyc = 1'b0; VGA_COLOR = colour; plot = 1'b0;
         Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
-		ExcApple = 1'b0; EycApple = 1'b0;
-        LxcApple = 1'b0; LycApple = 1'b0;
 
         case (y_Q)
-            A:  begin 
-                Lxc = 1'b1; 
-                Lyc = 1'b1; 
-                LxcApple = 1'b1; 
-                LycApple = 1'b1;
-                end
-
-            BB:  begin 
-				ExcApple = 1'b1; 
-				VGA_COLOR = 3'b100; 
-                plot = 1'b1; 
-				// Xdraw = XApple;
-				// XCdraw = XCApple;
-				// Ydraw = YApple;
-				// YCdraw = YCApple;
-				end // color a pixel
-				
-            CC:  begin 
-				LxcApple = 1'b1; 
-				EycApple = 1'b1; 
-				// VGA_COLOR = 3'b100; 
-				end
-
-            B:  begin 
-				Exc = 1'b1; 
-				plot = 1'b1; 
-				// Xdraw = X;
-				// XCdraw = XC;
-				// Ydraw = Y;
-				// YCdraw = YC;
-				end   // color a pixel
-            C:  begin 
-				Lxc = 1'b1; 
-				Eyc = 1'b1; 
-				
-				end
-
-            D:  Lyc = 1'b1;
-            // Lxc = 1'b1; 
-				
-            // DD:  Lyc = 1'b1;
-				
-            E:  begin 
-				Exc = 1'b1; 
-				VGA_COLOR = ALT; 
-				plot = 1'b1; 
-				// Xdraw = X;
-				// XCdraw = XC;
-				// Ydraw = Y;
-				// YCdraw = YC;
-				end   // color a pixel
-
-            F:  begin 
-                Lxc = 1'b1; 
-                Eyc = 1'b1; 
-                end
-
-            G:  begin 
-                Lyc = 1'b1; 
-                LycApple = 1'b1; 
-
+            A:  begin Lxc = 1'b1; Lyc = 1'b1; end
+            B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
+            C:  begin Lxc = 1'b1; Eyc = 1'b1; end
+            drawed: Lyc = 1'b1;
+           // D:  
+            E:  begin Exc = 1'b1; VGA_COLOR = ALT; plot = 1'b1; end   // color a pixel
+            F:  begin Lxc = 1'b1; Eyc = 1'b1; end
+            erased: Lyc = 1'b1; 
+          //  G:  begin 
+                
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
                 // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
 
@@ -243,33 +223,45 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 //     Tdir_Y = (Y > 0) ? 1'b0 : 1'b1; // Move up, stop at screen edge
                 // else
                 //     Tdir_Y = 1'b0; // Default to no vertical movement
-            end
+       //     end
 
             H:  
             begin
-				
-            if (move_left)
-				begin
-                Ex <= 1'b1;
-                Xdir = 1'b0;
-				end
-            else if (move_up)
-				begin
-                Ey <= 1'b1;
-                Ydir = 1'b0;
-				end
-            else if (move_down)
-				begin
-                Ey <= 1'b1;
-                Ydir = 1'b1;
-				end
-            else if (move_right)
-				begin
-                Ex <= 1'b1;
-                Xdir = 1'b1;
+            // if (drawBodyCount > 1)
+            //     drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
+            // else
+            //     begin
+            //     drawBodyCount <= 4;
+            if (drawBodyCount == 1)
+                begin
+                if (move_left)
+                    begin
+                    Ex <= 1'b1;
+                    Xdir = 1'b0;
+                    end
+                else if (move_up)
+                    begin
+                    Ey <= 1'b1;
+                    Ydir = 1'b0;
+                    end
+                else if (move_down)
+                    begin
+                    Ey <= 1'b1;
+                    Ydir = 1'b1;
+                    end
+                else if (move_right)
+                    begin
+                    Ex <= 1'b1;
+                    Xdir = 1'b1;
+                    end
                 end
 
-
+            // // Draw the stationary square (fixed position)
+            // if (VGA_X >= Xapple && VGA_X < Xapple + XDIM && VGA_Y >= Yapple && VGA_Y < Yapple + YDIM) 
+            // begin
+            //     plot = 1'b1;          // enable plotting
+            //     VGA_COLOR = 3'b100;   // Set the color for the stationary square
+            // end
 
             end
         endcase
@@ -277,17 +269,42 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     always @(posedge CLOCK_50)
         if (!SW[9])
+				begin
             y_Q <= 1'b0;
+            drawBodyCount <= 4;
+				end
         else
+            begin
             y_Q <= Y_D;
+            if ((y_Q == C && Y_D == drawed) || (y_Q == F && Y_D == erased))
+                begin
+                if (drawBodyCount > 1)  
+                    drawBodyCount <= drawBodyCount - 1;
+                else 
+                    drawBodyCount <= 4;
+                end
+            end
 
-    assign go = ~SW[7];
+    assign go = SW[7];
 
-    // assign VGA_X = Xdraw + XCdraw;
-    // assign VGA_Y = Ydraw + YCdraw;
 
-    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : (X + XC);
-    assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : (Y + YC);
+    reg [7:0] VGA_X_reg, VGA_Y_reg;
+
+    always @(*) begin
+        VGA_X_reg = XSnakeLong[8 * drawBodyCount-1 -: 8] + XC;
+        VGA_Y_reg = YSnakeLong[7 * drawBodyCount-1 -: 7] + YC;
+        // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
+        // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
+    end
+
+    assign VGA_X = VGA_X_reg;
+    assign VGA_Y = VGA_Y_reg;
+    // assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
+    // assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
+
+    // assign VGA_X = X + XC;
+    // assign VGA_Y = Y + YC;
+
     // connect to VGA controller
     vga_adapter VGA (
 			.resetn(SW[9]),
@@ -392,13 +409,34 @@ module hex7seg (hex, display);
         endcase
 endmodule
 
+module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
+	 parameter n = 8;
+    parameter maxLength = 4;
+	 
+    input clk;
+    input enable, reset;
+    // input maxLength; 
+    input [ n * maxLength-1 :0 ] data;
+    input [ n-1 :0 ] data_in;
+    output reg [ n * maxLength-1 :0 ] data_out;
+
+    parameter [n - 1 : 0] P0 = 8'd39, 
+                          P1 = 8'd39, 
+                          P2 = 8'd39, 
+                          P3 = 8'd39;
 
 
+    always @(posedge clk) 
+    begin
+        if (reset) begin
+            data_out <= {P0, P1, P2, P3};
+        end
+        
+        else if (enable) begin
+            // left is the head
+            // add new data to the front the rest follows
+            data_out <= {data_in, data[n * maxLength-1 : n-1 ]};
+        end
+    end
 
-
-
-
-
-
-
-
+endmodule
