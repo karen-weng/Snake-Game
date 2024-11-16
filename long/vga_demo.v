@@ -14,10 +14,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-    parameter X0 = 8'd00, Y0 = 7'd00;
-    parameter X1 = 8'd00, Y1 = 7'd00;
-    parameter X2 = 8'd00, Y2 = 7'd00;
-    parameter X3 = 8'd80, Y3 = 7'd60;
+    parameter X0 = 8'd80, Y0 = 7'd10;
+    parameter X1 = 8'd80, Y1 = 7'd40;
+    parameter X2 = 8'd80, Y2 = 7'd70;
+    parameter X3 = 8'd80, Y3 = 7'd100;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -55,7 +55,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
 	 
     // added
-	reg Xdir;
+	 reg Xdir;
     reg Ydir;
 
     reg move_left, move_up, move_down, move_right;
@@ -64,7 +64,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg drawBodyCount; 
+    reg [2:0] drawBodyCount; 
     wire [31:0] XSnakeLong;
     wire [27:0] YSnakeLong;
 
@@ -96,7 +96,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 	
 	assign colour = SW[2:0];
 
-    UpDn_count U1 (Y0, CLOCK_50, SW[9], Ey, ~SW[8], Ydir, Y); // Sw[9] reset Sw[8] load
+    UpDn_count U1 (Y0, CLOCK_50, SW[9], Ey, ~SW[8], Ydir, Y); // Sw[9] reset Sw[8] negative load
         defparam U1.n = 7;
 
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
@@ -171,8 +171,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
                 else Y_D = D;
-            D:  if (!sync) Y_D = D;
+				D:  if (!sync) Y_D = D;
                 else Y_D = E;
+			//	D:		Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
@@ -190,7 +191,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
 
         case (y_Q)
-            A:  begin Lxc = 1'b1; Lyc = 1'b1; drawBodyCount <= 4; end
+            A:  begin Lxc = 1'b1; Lyc = 1'b1; end
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
             C:  begin Lxc = 1'b1; Eyc = 1'b1; end
             D:  Lyc = 1'b1;
@@ -261,12 +262,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     always @(posedge CLOCK_50)
         if (!SW[9])
+				begin
             y_Q <= 1'b0;
             drawBodyCount <= 4;
+				end
         else
             begin
             y_Q <= Y_D;
-            if (y_Q == H && Y_D == A)
+            if (y_Q == G && Y_D == H)
                 begin
                 if (drawBodyCount > 1)  
                     drawBodyCount <= drawBodyCount - 1;
@@ -275,14 +278,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
             end
 
-    assign go = ~SW[7];
+    assign go = SW[7];
 
 
     reg [7:0] VGA_X_reg, VGA_Y_reg;
 
     always @(*) begin
-        VGA_X_reg = XSnakeLong[8 * drawBodyCount -: 8] + XC;
-        VGA_Y_reg = YSnakeLong[7 * drawBodyCount -: 7] + YC;
+        VGA_X_reg = XSnakeLong[8 * drawBodyCount-1 -: 8] + XC;
+        VGA_Y_reg = YSnakeLong[7 * drawBodyCount-1 -: 7] + YC;
         // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
         // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
     end
@@ -399,7 +402,10 @@ module hex7seg (hex, display);
         endcase
 endmodule
 
-module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
+module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
+	 parameter n = 8;
+    parameter maxLength = 4;
+	 
     input clk;
     input enable, reset;
     // input maxLength; 
@@ -411,8 +417,7 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
                           P1 = 8'd39, 
                           P2 = 8'd39, 
                           P3 = 8'd39;
-    parameter n = 8;
-    parameter maxLength = 4;
+
 
     always @(posedge clk) 
     begin
