@@ -95,23 +95,23 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
 
 
-    UpDn_count U22 (Y1, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[20 : 14]); // Sw[9] reset Sw[8] load
-        defparam U22.n = 7;
+    // UpDn_count U22 (Y1, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[20 : 14]); // Sw[9] reset Sw[8] load
+    //     defparam U22.n = 7;
 
-    UpDn_count U33 (X1, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[23 : 16]);
-        defparam U33.n = 8;
+    // UpDn_count U33 (X1, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[23 : 16]);
+    //     defparam U33.n = 8;
 
-    UpDn_count U44 (Y2, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[13 : 7]); // Sw[9] reset Sw[8] load
-        defparam U44.n = 7;
+    // UpDn_count U44 (Y2, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[13 : 7]); // Sw[9] reset Sw[8] load
+    //     defparam U44.n = 7;
 
-    UpDn_count U55 (X2, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[15 : 8]);
-        defparam U55.n = 8;
+    // UpDn_count U55 (X2, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[15 : 8]);
+    //     defparam U55.n = 8;
 
-    UpDn_count U66 (Y3, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[6:0]); // Sw[9] reset Sw[8] load
-        defparam U66.n = 7;
+    // UpDn_count U66 (Y3, CLOCK_50, SW[9], 1'b0, ~SW[8], Ydir, YSnakeLong[6:0]); // Sw[9] reset Sw[8] load
+    //     defparam U66.n = 7;
 
-    UpDn_count U77 (X3, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[7:0]);
-        defparam U77.n = 8;
+    // UpDn_count U77 (X3, CLOCK_50, SW[9], 1'b0, ~SW[8], Xdir, XSnakeLong[7:0]);
+    //     defparam U77.n = 8;
 
 
 
