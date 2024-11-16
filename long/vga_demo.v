@@ -261,8 +261,18 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @(posedge CLOCK_50)
         if (!SW[9])
             y_Q <= 1'b0;
+            drawBodyCount <= 4;
         else
+            begin
             y_Q <= Y_D;
+            if (y_Q == H && Y_D == A)
+                begin
+                if (drawBodyCount > 1)  
+                    drawBodyCount <= drawBodyCount - 1;
+                else 
+                    drawBodyCount <= 4;
+                end
+            end
 
     assign go = ~SW[7];
 
