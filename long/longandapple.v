@@ -43,10 +43,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [7:0] Xapple;
     wire [6:0] Yapple; 
 
-    assign Xapple = 8'd80;
-    assign Yapple = 7'd60; 
-
-
     wire [2:0] colour;
     wire [7:0] X;
     wire [6:0] Y;
@@ -55,9 +51,19 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [K-1:0] slow;
     wire go, sync;
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
+
+    wire [7:0] XApple;
+    wire [6:0] YApple;
+
+    assign XApple = 8'd30;
+    assign YApple = 7'd30;
+        
+    wire [7:0] XCApple;
+    wire [6:0] YCApple;
+    reg LxcApple, LycApple, ExcApple, EycApple;
 	 
     // added
-	 reg Xdir;
+	reg Xdir;
     reg Ydir;
 
     reg move_left, move_up, move_down, move_right;
@@ -132,6 +138,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     UpDn_count U4 (7'd0, CLOCK_50, SW[9], Eyc, Lyc, 1'b1, YC);
         defparam U4.n = 7;
 
+    UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
+        defparam U6.n = 8;
+    UpDn_count U7 (7'd0, CLOCK_50, SW[9], EycApple, LycApple, 1'b1, YCApple);
+        defparam U7.n = 7;
+
     UpDn_count U5 ({K{1'b0}}, CLOCK_50, SW[9], 1'b1, 1'b0, 1'b1, slow);
         defparam U5.n = K;
     assign sync = (slow == 0);
@@ -168,7 +179,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @ (*)
         case (y_Q)
             A:  if (!go || !sync) Y_D = A;
+                else Y_D = BB;
+
+            BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
+                else Y_D = CC;
+            CC:  if (YCApple != YDIM-1) Y_D = BB;
                 else Y_D = B;
+
+
             B:  if (XC != XDIM-1) Y_D = B;    // draw
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
@@ -184,7 +202,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             erased: if (drawBodyCount >= 1) Y_D = E;
                     else Y_D = G;
             G:  Y_D = H;	 
-            H:  Y_D = B; // move
+            H:  Y_D = BB; // move
         endcase
 
 
@@ -194,15 +212,45 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         // default assignments
         Lxc = 1'b0; Lyc = 1'b0; Exc = 1'b0; Eyc = 1'b0; VGA_COLOR = colour; plot = 1'b0;
         Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
+    	ExcApple = 1'b0; EycApple = 1'b0;
+        LxcApple = 1'b0; LycApple = 1'b0;
 
         case (y_Q)
-            A:  begin Lxc = 1'b1; Lyc = 1'b1; end
+            A:  begin 
+                Lxc = 1'b1; 
+                Lyc = 1'b1; 
+                LxcApple = 1'b1; 
+                LycApple = 1'b1;
+                end
+
+            BB:  begin 
+				ExcApple = 1'b1; 
+				VGA_COLOR = 3'b100; 
+                plot = 1'b1; 
+				end // color a pixel
+
+            CC:  begin 
+				LxcApple = 1'b1; 
+				EycApple = 1'b1; 
+				end
+
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
+
             C:  begin Lxc = 1'b1; Eyc = 1'b1; end
+
             drawed: Lyc = 1'b1;
            // D:  
-            E:  begin Exc = 1'b1; VGA_COLOR = ALT; plot = 1'b1; end   // color a pixel
-            F:  begin Lxc = 1'b1; Eyc = 1'b1; end
+            E:  begin 
+                Exc = 1'b1; 
+                VGA_COLOR = ALT; 
+                plot = 1'b1; 
+                end   // color a pixel
+
+            F:  begin 
+                Lxc = 1'b1; 
+                Eyc = 1'b1; 
+                end
+
             erased: Lyc = 1'b1; 
           //  G:  begin 
                 
@@ -227,6 +275,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             H:  
             begin
+
+                LycApple = 1'b1; 
+
             // if (drawBodyCount > 1)
             //     drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
             // else
@@ -297,8 +348,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
     end
 
-    assign VGA_X = VGA_X_reg;
-    assign VGA_Y = VGA_Y_reg;
+    // assign VGA_X = VGA_X_reg;
+    // assign VGA_Y = VGA_Y_reg;
+
+    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : VGA_X_reg;
+    assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : VGA_Y_reg;
     // assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
     // assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
 
