@@ -88,14 +88,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //     end
     // end
 
-    // shift_register_move_snake S0 (CLOCK_50, SW[9], SW[8], XSnakeLong, X, XSnakeLong);
-    //     defparam S0.n = 8; 
-    // shift_register_move_snake S1 (CLOCK_50, SW[9], SW[8], YSnakeLong, Y, YSnakeLong);
-    //     defparam S0.n = 7; 
-    //     defparam S0.P0 = 7'd59;
-    //     defparam S0.P1 = 7'd69;
-    //     defparam S0.P2 = 7'd79;
-    //     defparam S0.P3 = 7'd89;
+    shift_register_move_snake S0 (CLOCK_50, SW[9], SW[8], XSnakeLong, X, XSnakeLong);
+        defparam S0.n = 8; 
+    shift_register_move_snake S1 (CLOCK_50, SW[9], SW[8], YSnakeLong, Y, YSnakeLong);
+        defparam S0.n = 7; 
+        defparam S0.P0 = 7'd59;
+        defparam S0.P1 = 7'd69;
+        defparam S0.P2 = 7'd79;
+        defparam S0.P3 = 7'd89;
 
 
     reg Tdir_X;
