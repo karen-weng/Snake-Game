@@ -12,7 +12,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
     parameter drawed = 4'b1000, erased = 4'b1001;
     parameter BB = 4'b1010, CC = 4'b1011; 
-	 parameter shift = 4'b1100; 
+	parameter shift = 4'b1100; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
@@ -207,7 +207,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     else Y_D = G;
             G:  Y_D = H;	 
             H:  Y_D = shift; // move
-				shift:  Y_D = BB; // shiftreg
+			shift:  Y_D = BB; // shiftreg
         endcase
 
 
@@ -478,7 +478,7 @@ module hex7seg (hex, display);
 endmodule
 
 module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
-	 parameter n = 8;
+	parameter n = 8;
     parameter maxLength = 4;
     parameter DIM = 10;
 	 
