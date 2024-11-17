@@ -70,7 +70,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg [3:0] drawBodyCount; 
+    reg [15:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
 
@@ -332,7 +332,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         if (!SW[9])
 				begin
             y_Q <= 1'b0;
-            drawBodyCount <= 4;
+            drawBodyCount <= maxLength * XDIM;
 				end
         else
             begin
@@ -346,7 +346,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					 
 					
             else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
-                drawBodyCount <= 4;
+                drawBodyCount <= maxLength * XDIM;
                 
             end
 
