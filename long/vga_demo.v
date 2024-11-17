@@ -17,10 +17,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-    parameter X0 = 8'd40, Y0 = 7'd30;
-    parameter X1 = 8'd50, Y1 = 7'd40;
-    parameter X2 = 8'd60, Y2 = 7'd50;
-    parameter X3 = 8'd80, Y3 = 7'd60;
+    parameter X0 = 8'd80, Y0 = 7'd60;
+    parameter X1 = 8'd80, Y1 = 7'd70;
+    parameter X2 = 8'd80, Y2 = 7'd80;
+    parameter X3 = 8'd80, Y3 = 7'd90;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -40,9 +40,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [6:0] VGA_Y;  
     reg [2:0] VGA_COLOR;
     reg plot;
-
-    wire [7:0] Xapple;
-    wire [6:0] Yapple; 
 
     wire [2:0] colour;
     wire [7:0] X;
@@ -505,7 +502,7 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 			  //data_out <= 0;
         end
         
-        else if (enable) begin
+        if (enable) begin
             // left is the head
             // add new data to the front the rest follows
             data_out <= {data_in, data[n * maxLength-1 : n ]};
