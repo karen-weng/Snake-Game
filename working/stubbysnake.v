@@ -71,8 +71,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // assign maxLength = 2;
 
     reg [3:0] drawBodyCount; 
-    wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
-    wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
+    wire [31:0] XSnakeLong;
+    wire [27:0] YSnakeLong;
 
    // assign XSnakeLong = {X0, X1, X2, X3};
  //   assign YSnakeLong = {Y0, Y1, Y2, Y3};
@@ -88,7 +88,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     shift_register_move_snake S0 (CLOCK_50, Eshift, SW[5], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
-		defparam S0.P0 = X0;
+		  defparam S0.P0 = X0;
         defparam S0.P1 = X1;
         defparam S0.P2 = X2;
         defparam S0.P3 = X3;
@@ -96,7 +96,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 		  
     shift_register_move_snake S1 (CLOCK_50, Eshift, SW[5], YSnakeLong, Y, YSnakeLong);
         defparam S1.n = 7; 
-		defparam S1.P0 = Y0;
+		  defparam S1.P0 = Y0;
         defparam S1.P1 = Y1;
         defparam S1.P2 = Y2;
         defparam S1.P3 = Y3;
@@ -339,14 +339,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             y_Q <= Y_D;
 				
             if ((y_Q == drawed && Y_D == B) || (y_Q == erased && Y_D == E))
-                begin
-            // if (drawBodyCount >= 1)  
-                drawBodyCount <= drawBodyCount - 1;
-                end
+					begin
+               // if (drawBodyCount >= 1)  
+                    drawBodyCount <= drawBodyCount - 1;
+					end
 					 
 					
-            else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
-                drawBodyCount <= 4;
+				else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
+						
+                    drawBodyCount <= 4;
                 
             end
 
@@ -356,8 +357,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg [7:0] VGA_X_reg, VGA_Y_reg;
 
     always @(*) begin
-        VGA_X_reg = XSnakeLong[8 * XDIM * drawBodyCount -1 -: 8] + XC;
-        VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
+        VGA_X_reg = XSnakeLong[8 * drawBodyCount-1 -: 8] + XC;
+        VGA_Y_reg = YSnakeLong[7 * drawBodyCount-1 -: 7] + YC;
         // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
         // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
     end
@@ -480,14 +481,13 @@ endmodule
 module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
 	 parameter n = 8;
     parameter maxLength = 4;
-    parameter DIM = 10;
 	 
     input clk;
     input enable, reset;
     // input maxLength; 
-    input [ n * maxLength * DIM - 1 :0 ] data;
-    input [ n - 1 :0 ] data_in;
-    output reg [ n * maxLength * DIM - 1 :0 ] data_out;
+    input [ n * maxLength-1 :0 ] data;
+    input [ n-1 :0 ] data_in;
+    output reg [ n * maxLength-1 :0 ] data_out;
 
     parameter [n - 1 : 0] P0 = {n{1'b0}}, 
                       P1 = {n{1'b0}}, 
@@ -498,7 +498,7 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     always @(posedge clk) 
     begin
         if (reset) begin
-           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}};
+           data_out <= {P0, P1, P2, P3};
 			  //data_out <= 0;
         end
         
