@@ -90,7 +90,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     shift_register_move_snake S0 (CLOCK_50, Eshift, SW[5], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
-		  defparam S0.P0 = X0;
+		defparam S0.P0 = X0;
         defparam S0.P1 = X1;
         defparam S0.P2 = X2;
         defparam S0.P3 = X3;
@@ -486,10 +486,10 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     input [ n-1 :0 ] data_in;
     output reg [ n * maxLength-1 :0 ] data_out;
 
-    parameter [n - 1 : 0] P0 = 7'd90, 
-                          P1 = 7'd90, 
-                          P2 = 7'd90, 
-                          P3 = 7'd90;
+    parameter [n - 1 : 0] P0 = {n{1'b0}}, 
+                      P1 = {n{1'b0}}, 
+                      P2 = {n{1'b0}}, 
+                      P3 = {n{1'b0}};
 
 
     always @(posedge clk) 
@@ -502,7 +502,7 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
         else if (enable) begin
             // left is the head
             // add new data to the front the rest follows
-            data_out <= {data_in, data[n * maxLength-1 : n-1 ]};
+            data_out <= {data_in, data[n * maxLength-1 : n ]};
         end
     end
 
