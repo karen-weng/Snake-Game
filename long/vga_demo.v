@@ -17,9 +17,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
 
-    parameter X0 = 8'd80, Y0 = 7'd30;
-    parameter X1 = 8'd80, Y1 = 7'd40;
-    parameter X2 = 8'd80, Y2 = 7'd50;
+    parameter X0 = 8'd40, Y0 = 7'd30;
+    parameter X1 = 8'd50, Y1 = 7'd40;
+    parameter X2 = 8'd60, Y2 = 7'd50;
     parameter X3 = 8'd80, Y3 = 7'd60;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
@@ -91,7 +91,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     shift_register_move_snake S0 (CLOCK_50, Eshift, SW[5], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
-		defparam S0.P0 = X0;
+		  defparam S0.P0 = X0;
         defparam S0.P1 = X1;
         defparam S0.P2 = X2;
         defparam S0.P3 = X3;
@@ -198,7 +198,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
                 else Y_D = drawed;
-            drawed: if (drawBodyCount >= 1) Y_D = B;
+            drawed: if (drawBodyCount > 1) Y_D = B;
                     else Y_D = D;
 			D:  if (!sync) Y_D = D;
                 else Y_D = E;
@@ -206,7 +206,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
                 else Y_D = erased; 
-            erased: if (drawBodyCount >= 1) Y_D = E;
+            erased: if (drawBodyCount > 1) Y_D = E;
                     else Y_D = G;
             G:  Y_D = H;	 
             H:  Y_D = shift; // move
@@ -321,7 +321,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
 					 
 				shift: 
-				  //  if (drawBodyCount == 1)
+				    //if (drawBodyCount == 1)
                 begin
 					 Eshift = 1'b1;
 					 end
@@ -341,9 +341,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             begin
             y_Q <= Y_D;
 				
-            if ((y_Q == C && Y_D == drawed) || (y_Q == F && Y_D == erased))
+            if ((y_Q == drawed && Y_D == B) || (y_Q == erased && Y_D == E))
 					begin
-                if (drawBodyCount > 1)  
+               // if (drawBodyCount >= 1)  
                     drawBodyCount <= drawBodyCount - 1;
 					end
 					 
@@ -354,7 +354,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 
             end
 
-    assign go = ~ SW[7];
+    assign go = SW[7];
 
 
     reg [7:0] VGA_X_reg, VGA_Y_reg;
