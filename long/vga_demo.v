@@ -12,6 +12,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
     parameter drawed = 4'b1000, erased = 4'b1001;
     parameter BB = 4'b1010, CC = 4'b1011; 
+	 parameter shift = 4'b1100; 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
@@ -208,7 +209,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             erased: if (drawBodyCount >= 1) Y_D = E;
                     else Y_D = G;
             G:  Y_D = H;	 
-            H:  Y_D = BB; // move
+            H:  Y_D = shift; // move
+				shift:  Y_D = BB; // shiftreg
         endcase
 
 
@@ -293,9 +295,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				
 					
 									 
-            if (drawBodyCount == 1)
-                begin
-					 Eshift = 1'b1;
+         //   if (drawBodyCount == 1)
+                //begin
 
                 if (move_left)
                     begin
@@ -318,15 +319,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     Xdir = 1'b1;
                     end
                 end
+					 
+				shift: 
+				  //  if (drawBodyCount == 1)
+                begin
+					 Eshift = 1'b1;
+					 end
+					
 
-            // // Draw the stationary square (fixed position)
-            // if (VGA_X >= Xapple && VGA_X < Xapple + XDIM && VGA_Y >= Yapple && VGA_Y < Yapple + YDIM) 
-            // begin
-            //     plot = 1'b1;          // enable plotting
-            //     VGA_COLOR = 3'b100;   // Set the color for the stationary square
-            // end
-
-            end
+          //  end
         endcase
     end
 
@@ -339,13 +340,18 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         else
             begin
             y_Q <= Y_D;
+				
             if ((y_Q == C && Y_D == drawed) || (y_Q == F && Y_D == erased))
-                begin
+					begin
                 if (drawBodyCount > 1)  
                     drawBodyCount <= drawBodyCount - 1;
-                else 
+					end
+					 
+					
+				else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
+						
                     drawBodyCount <= 4;
-                end
+                
             end
 
     assign go = ~ SW[7];
