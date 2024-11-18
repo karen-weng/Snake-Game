@@ -61,16 +61,32 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg LxcApple, LycApple, ExcApple, EycApple;
 	 
     // added
-		reg Xdir;
+	reg Xdir;
     reg Ydir;
 	 
-	 reg gameEnded;
+	reg gameEnded;
 
     reg move_left, move_up, move_down, move_right;
 
     parameter maxLength = 4;
     // wire maxLength;
     // assign maxLength = 2;
+
+    wire [3:0] currentLength;
+    wire hit;
+
+    always @(posedge SW[4] or posedge SW[5]) 
+        begin
+        if (SW[5]) 
+            begin
+            currentLength <= 4'b1; // Reset to zero when sw[5] is high
+            end 
+        else if (currentLength < 4'b1111) 
+            begin
+            currentLength <= currentLength + 1; // Increment on the posedge of sw[4]
+            end
+    end
+
 
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
@@ -222,7 +238,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
     	ExcApple = 1'b0; EycApple = 1'b0;
         LxcApple = 1'b0; LycApple = 1'b0;
-		  Eshift = 1'b0;
+		Eshift = 1'b0;
 
         case (y_Q)
             A:  begin 
@@ -261,9 +277,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
 
             erased: Lyc = 1'b1; 
-           G:  begin 
-               gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM);
-					end
+           G:   begin 
+				ifhit H1 (X, Y, XSnakeLong, YSnakeLong, currentLength, hit)
+                gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
+                end
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
                 // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
 
@@ -285,7 +302,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             H:  
             begin
-
                 LycApple = 1'b1; 
 
             // if (drawBodyCount > 1)
@@ -321,13 +337,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     end
                 end
 					 
-				shift: 
-				    //if (drawBodyCount == 1)
-                begin
-					 Eshift = 1'b1;
-					 end
-					 
-				endGame: VGA_COLOR=3'b111; 
+            shift: Eshift = 1'b1;
+                    
+            endGame: VGA_COLOR=3'b111; 
 					
 
           //  end

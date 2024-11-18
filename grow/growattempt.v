@@ -495,13 +495,7 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out, i
                       P3 = {n{1'b0}};
                     
 
-    always @(posedge SW[4] or posedge SW[5]) begin
-        if (SW[5]) begin
-            currentLength <= 4'b0; // Reset to zero when sw[5] is high
-        end else begin
-            currentLength <= currentLength + 1; // Increment on the posedge of sw[4]
-        end
-    end
+
 
 
     always @(posedge clk) 
