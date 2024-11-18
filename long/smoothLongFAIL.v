@@ -70,7 +70,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg [16:0] drawBodyCount; 
+    reg [7:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
 
@@ -503,3 +503,5 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     end
 
 endmodule
+
+
