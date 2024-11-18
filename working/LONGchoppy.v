@@ -67,24 +67,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg move_left, move_up, move_down, move_right;
 
     parameter maxLength = 4;
-    // wire maxLength;
-    // assign maxLength = 2;
 
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
 
-   // assign XSnakeLong = {X0, X1, X2, X3};
- //   assign YSnakeLong = {Y0, Y1, Y2, Y3};
-
     reg Eshift;
-
-    // initial begin
-    //     for (i = 0; i < maxLength; i = i + 1) begin
-    //         XSnakeLong[i * 8 +: 8] = X0 - (i * XDIM); // X coordinates, evenly spaced
-    //         YSnakeLong[i * 7 +: 7] = Y0;             // Same Y coordinate
-    //     end
-    // end
 
     shift_register_move_snake S0 (CLOCK_50, Eshift, SW[5], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
@@ -259,38 +247,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             erased: Lyc = 1'b1; 
           //  G:  begin 
-                
-                // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
-                // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
-
-                // Adjust Tdir_X and Tdir_Y based on the active direction flags
-                // if (move_right)
-                //     Tdir_X = (X < XSCREEN - XDIM) ? 1'b1 : 1'b0; // Move right, stop at screen edge
-                // else if (move_left)
-                //     Tdir_X = (X > 0) ? 1'b0 : 1'b1; // Move left, stop at screen edge
-                // else
-                //     Tdir_X = 1'b0; // Default to no horizontal movement
-
-                // if (move_down)
-                //     Tdir_Y = (Y < YSCREEN - YDIM) ? 1'b1 : 1'b0; // Move down, stop at screen edge
-                // else if (move_up)
-                //     Tdir_Y = (Y > 0) ? 1'b0 : 1'b1; // Move up, stop at screen edge
-                // else
-                //     Tdir_Y = 1'b0; // Default to no vertical movement
-       //     end
+           //     end
 
             H:  
             begin
 
                 LycApple = 1'b1; 
-
-            // if (drawBodyCount > 1)
-            //     drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
-            // else
-            //     begin
-            //     drawBodyCount <= 4;
-				
-					
 									 
          //   if (drawBodyCount == 1)
                 //begin
@@ -358,17 +320,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @(*) begin
         VGA_X_reg = XSnakeLong[8 * XDIM * drawBodyCount -1 -: 8] + XC;
         VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
-        // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
-        // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
-    end
+     end
 
-    // assign VGA_X = VGA_X_reg;
-    // assign VGA_Y = VGA_Y_reg;
 
     assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : VGA_X_reg;
     assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : VGA_Y_reg;
-    // assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
-    // assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
 
     // assign VGA_X = X + XC;
     // assign VGA_Y = Y + YC;
