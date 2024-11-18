@@ -513,11 +513,12 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out, i
             currentLength <= 4'b0;
 			  //data_out <= 0;
         end
-        if (increase) {
-            data_out <= {data[ n * maxLength * DIM -1 : n * (maxLength - currentLength) * DIM ], 
+        if (increase) 
+            begin
+            data_out <= { {data[ n * maxLength * DIM -1 : n * (maxLength - currentLength) * DIM ]}, 
                        { (maxLength - currentLength +1 ) {data[ n * (maxLength - currentLength + 1) * DIM : n * (maxLength - currentLength) * DIM ]} } };
-                       currentLength <= currentLength + 1;
-        }
+            currentLength <= currentLength + 1;
+            end
         else if (enable) begin
             // left is the head
             // add new data to the front the rest follows

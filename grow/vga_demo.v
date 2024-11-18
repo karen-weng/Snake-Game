@@ -354,9 +354,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @(*) begin
         VGA_X_reg = XSnakeLong[8 * XDIM * drawBodyCount -1 -: 8] + XC;
         VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
-        // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
-        // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
-    end
+     end
 
     // assign VGA_X = VGA_X_reg;
     // assign VGA_Y = VGA_Y_reg;
@@ -487,22 +485,12 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out, i
     output reg [ n * maxLength * DIM - 1 : 0 ] data_out;
 
     input increase;
-    output [3:0] currentLength;
+    output reg [3:0] currentLength;
 
     parameter [n - 1 : 0] P0 = {n{1'b0}}, 
                       P1 = {n{1'b0}}, 
                       P2 = {n{1'b0}}, 
                       P3 = {n{1'b0}};
-                    
-
-   // always @(posedge SW[4] or posedge SW[5]) begin
-    //    if (SW[5]) begin
-      //      currentLength <= 4'b1; // Reset to zero when sw[5] is high
-    //    end else begin
-           // currentLength <= currentLength + 1; // Increment on the posedge of sw[4]
-      //  end
-   //end
-
 
     always @(posedge clk) 
     begin
@@ -510,13 +498,17 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out, i
         if (reset) begin
 
             data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}};
-            currentLength <= 4'b0;
+            currentLength <= 4'b1;
 			  //data_out <= 0;
         end
         if (increase) 
 				begin
             data_out <= { {data[ n * maxLength * DIM -1 : n * (maxLength - currentLength) * DIM ]}, 
                        { (maxLength - currentLength +1 ) {data[ n * (maxLength - currentLength + 1) * DIM : n * (maxLength - currentLength) * DIM ]} } };
+
+            data_old = data_out[n * currentLength * DIM - 1 -: n*currentLength];
+            data_old = data_out[n * currentLength * DIM - 1 -: n];
+
             currentLength <= currentLength + 1;
 				end
         
