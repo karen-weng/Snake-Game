@@ -325,7 +325,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         if (!SW[9])
 				begin
             y_Q <= 1'b0;
-            drawBodyCount <= (maxLength * XDIM);
+            drawBodyCount <= 40; // maxLength * XDIM
 				end
         else
             begin
@@ -339,7 +339,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					 
 					
             else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
-                drawBodyCount <= (maxLength * XDIM);
+                drawBodyCount <= 40; //maxLength * XDIM
                 
             end
 
