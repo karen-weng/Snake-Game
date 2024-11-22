@@ -544,25 +544,27 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
     input [3:0] currentLength;
     output reg hit;
 
-    if (enable)
-        begin
+
         integer i;
 
         always @* begin
-            hit = 1'b0; // Default: no collision
+            if (enable)
+            begin
+                hit = 1'b0; // Default: no collision
 
-            // Loop through all segments of the active snake length
-            for (i = 1; i < currentLength; i = i + 1) begin
-                // Check for collisions with each body segment
-                if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
-                    (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
-                    (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
-                    hit = 1'b1; // Collision detected
+                // Loop through all segments of the active snake length
+                for (i = 1; i < currentLength; i = i + 1) begin
+                    // Check for collisions with each body segment
+                    if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
+                        (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
+                        (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
+                        (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+                        hit = 1'b1; // Collision detected
+                    end
                 end
             end
         end
-        end
+        
 
 endmodule 
 
