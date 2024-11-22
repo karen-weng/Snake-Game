@@ -533,50 +533,83 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 
 endmodule
 
-module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
-    parameter maxLength = 4;
-    parameter DIM = 10;
-    input enable;
-    input [7:0] Xhead;
-	input [6:0] Yhead;
-    input [8 * maxLength * DIM -1 :0] XSnakeLong;
-    input [7 * maxLength * DIM -1 :0] YSnakeLong;
-    input [3:0] currentLength;
-    output reg hit;
+// module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
+//     parameter maxLength = 4;
+//     parameter DIM = 10;
+//     input enable;
+//     input [7:0] Xhead;
+// 	input [6:0] Yhead;
+//     input [8 * maxLength * DIM -1 :0] XSnakeLong;
+//     input [7 * maxLength * DIM -1 :0] YSnakeLong;
+//     input [3:0] currentLength;
+//     output reg hit;
+
+//     integer i;
+
+//     always @* begin
+//         if (enable)
+//         begin
+//             hit = 1'b0; // Default: no collision
+//             if (currentLength >= 2)
+//             begin
+//             // Loop through all segments of the active snake length
+//             for (i = 1; i < currentLength; i = i + 1) begin
+//                 // Check for collisions with each body segment
+//                 if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
+//                     (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
+//                     (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
+//                     (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+//                     hit = 1'b1; // Collision detected
+//                 end
+//             end
+
+//             end
+//         end
+//     end
+        
+// endmodule 
+
+// // XSnakeLong[8 * XDIM * i -1 -: 8]
+// // [7 * YDIM * i -1 -: 7]
+
+// //         VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
+// //     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
+// //     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
 
 
-        integer i;
 
-        always @* begin
-            if (enable)
-            begin
-                hit = 1'b0; // Default: no collision
-                if (currentLength >= 2)
-                begin
+
+module ifhit #(parameter maxLength = 4, parameter DIM = 10) (
+    input enable,
+    input [7:0] Xhead,
+    input [6:0] Yhead,
+    input [8 * maxLength - 1:0] XSnakeLong, // X coordinates
+    input [7 * maxLength - 1:0] YSnakeLong, // Y coordinates
+    input [3:0] currentLength,
+    output reg hit
+);
+
+    integer i;
+
+    always @* begin
+        if (enable) begin
+            hit = 1'b0; // Default: no collision
+            if (currentLength >= 2) begin
                 // Loop through all segments of the active snake length
                 for (i = 1; i < currentLength; i = i + 1) begin
+                    // Correct indexing for X and Y coordinates
+                    wire [7:0] x_segment = XSnakeLong[(i - 1) * 8 +: 8];
+                    wire [6:0] y_segment = YSnakeLong[(i - 1) * 7 +: 7];
+
                     // Check for collisions with each body segment
-                    if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
-                        (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
-                        (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-                        (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+                    if ((Xhead < x_segment + DIM) &&
+                        (Xhead + DIM > x_segment) &&
+                        (Yhead < y_segment + DIM) &&
+                        (Yhead + DIM > y_segment)) begin
                         hit = 1'b1; // Collision detected
                     end
                 end
-                end
             end
         end
-        
-
-endmodule 
-
-// XSnakeLong[8 * XDIM * i -1 -: 8]
-// [7 * YDIM * i -1 -: 7]
-
-//         VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
-//     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
-//     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
-
-
-
-
+    end
+endmodule
