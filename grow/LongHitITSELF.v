@@ -74,7 +74,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg [3:0] currentLength;
     wire hit;
-    wire hitEnable;
+    reg hitEnable;
 
     always @(posedge SW[4] or posedge SW[5]) 
         begin
