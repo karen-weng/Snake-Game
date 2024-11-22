@@ -578,7 +578,6 @@ endmodule
 
 
 
-
 module ifhit #(parameter maxLength = 4, parameter DIM = 10) (
     input enable,
     input [7:0] Xhead,
@@ -597,9 +596,9 @@ module ifhit #(parameter maxLength = 4, parameter DIM = 10) (
             if (currentLength >= 2) begin
                 // Loop through all segments of the active snake length
                 for (i = 1; i < currentLength; i = i + 1) begin
-                    // Correct indexing for X and Y coordinates
-                    wire [7:0] x_segment = XSnakeLong[(i - 1) * 8 +: 8];
-                    wire [6:0] y_segment = YSnakeLong[(i - 1) * 7 +: 7];
+                    // Correct indexing for reversed storage
+                    wire [7:0] x_segment = XSnakeLong[(maxLength - i) * 8 - 1 -: 8];
+                    wire [6:0] y_segment = YSnakeLong[(maxLength - i) * 7 - 1 -: 7];
 
                     // Check for collisions with each body segment
                     if ((Xhead < x_segment + DIM) &&
