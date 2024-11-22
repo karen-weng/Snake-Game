@@ -551,7 +551,8 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
             if (enable)
             begin
                 hit = 1'b0; // Default: no collision
-
+                if (currentLength >= 2)
+                begin
                 // Loop through all segments of the active snake length
                 for (i = 1; i < currentLength; i = i + 1) begin
                     // Check for collisions with each body segment
@@ -561,6 +562,7 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
                         (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
                         hit = 1'b1; // Collision detected
                     end
+                end
                 end
             end
         end
