@@ -72,9 +72,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg [3:0] currentLength;
+    wire [3:0] currentLength;
     wire hit;
-    wire hitEnable;
 
     always @(posedge SW[4] or posedge SW[5]) 
         begin
@@ -119,8 +118,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam S1.P1 = Y1;
         defparam S1.P2 = Y2;
         defparam S1.P3 = Y3;
-
-    ifhit H1 (hitEnable, X, Y, XSnakeLong, YSnakeLong, currentLength, hit);
 
 
     reg Tdir_X;
@@ -242,7 +239,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     	ExcApple = 1'b0; EycApple = 1'b0;
         LxcApple = 1'b0; LycApple = 1'b0;
 		Eshift = 1'b0;
-        hitEnable = 1'b0;
 
         case (y_Q)
             A:  begin 
@@ -282,7 +278,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             erased: Lyc = 1'b1; 
            G:   begin 
-				hitEnable = 1'b1;
+				ifhit H1 (X, Y, XSnakeLong, YSnakeLong, currentLength, hit)
                 gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
                 end
                 // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
@@ -533,36 +529,32 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 
 endmodule
 
-module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
+module ifhit (Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit)
     parameter maxLength = 4;
     parameter DIM = 10;
-    input enable;
     input [7:0] Xhead;
 	input [6:0] Yhead;
     input [8 * maxLength * DIM -1 :0] XSnakeLong;
     input [7 * maxLength * DIM -1 :0] YSnakeLong;
     input [3:0] currentLength;
-    output reg hit;
+    output hit;
 
-    if (enable)
-        begin
-        integer i;
+    integer i;
 
-        always @* begin
-            hit = 1'b0; // Default: no collision
+always @* begin
+    hit = 1'b0; // Default: no collision
 
-            // Loop through all segments of the active snake length
-            for (i = 1; i < currentLength; i = i + 1) begin
-                // Check for collisions with each body segment
-                if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
-                    (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
-                    (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
-                    hit = 1'b1; // Collision detected
-                end
-            end
+    // Loop through all segments of the active snake length
+    for (i = 1; i < currentLength; i = i + 1) begin
+        // Check for collisions with each body segment
+        if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
+            (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
+            (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
+            (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+            hit = 1'b1; // Collision detected
         end
-        end
+    end
+end
 
 endmodule 
 
