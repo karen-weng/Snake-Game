@@ -543,6 +543,7 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, 
     input [8 * maxLength * DIM -1 :0] XSnakeLong;
     input [7 * maxLength * DIM -1 :0] YSnakeLong;
     input [3:0] currentLength;
+    input move_left, move_up, move_down, move_right;
     output reg hit;
 
     integer i;
