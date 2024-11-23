@@ -12,7 +12,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
     parameter drawed = 4'b1000, erased = 4'b1001;
     parameter BB = 4'b1010, CC = 4'b1011; 
-	parameter shift = 4'b1100, endGame=4'b1101; 
+	parameter shift = 4'b1100, endGameState=4'b1101; 
+    parameter hitState = 4'b1110; 
+
+
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
@@ -226,11 +229,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             F:  if (YC != YDIM-1) Y_D = E;
                 else Y_D = erased; 
             erased: if (drawBodyCount > 1) Y_D = E;
-                    else Y_D = G;
-            G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGame; end
+                    else Y_D = hitState;
+            hitState: Y_D = G;
+            G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGameState; end
             H:  Y_D = shift; // move
 			shift:  Y_D = BB; // shiftreg
-			endGame: Y_D = endGame; 
+			endGameState: Y_D = endGameState; 
         endcase
 
 
@@ -282,8 +286,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
 
             erased: Lyc = 1'b1; 
+            hitState: hitEnable = 1'b1;
            G:   begin 
-				hitEnable = 1'b1;
                 // gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
                 gameEnded = hit;
 
@@ -346,7 +350,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					 
             shift: Eshift = 1'b1;
                     
-            endGame: VGA_COLOR=3'b111; 
+            endGameState: VGA_COLOR=3'b111; 
 					
 
           //  end
