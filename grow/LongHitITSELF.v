@@ -133,7 +133,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     ifhit H1 (hitEnable, X, Y, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
 
-
     reg Tdir_X;
     reg Tdir_Y;
     reg [3:0] y_Q, Y_D;
@@ -197,7 +196,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // movement
     always @ (*)
     begin
-    if (~SW[9]) 
+    if (SW[5]) 
         begin
             move_right = 1'b0; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
         end
@@ -307,40 +306,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             hitState: hitEnable = 1'b1;
            G:   begin 
                 // gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
-                gameEnded = hit;
+                //gameEnded = hit;
 
                 end
-                // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
-                // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
-
-                // Adjust Tdir_X and Tdir_Y based on the active direction flags
-                // if (move_right)
-                //     Tdir_X = (X < XSCREEN - XDIM) ? 1'b1 : 1'b0; // Move right, stop at screen edge
-                // else if (move_left)
-                //     Tdir_X = (X > 0) ? 1'b0 : 1'b1; // Move left, stop at screen edge
-                // else
-                //     Tdir_X = 1'b0; // Default to no horizontal movement
-
-                // if (move_down)
-                //     Tdir_Y = (Y < YSCREEN - YDIM) ? 1'b1 : 1'b0; // Move down, stop at screen edge
-                // else if (move_up)
-                //     Tdir_Y = (Y > 0) ? 1'b0 : 1'b1; // Move up, stop at screen edge
-                // else
-                //     Tdir_Y = 1'b0; // Default to no vertical movement
-       //     end
 
             H:  
             begin
                 LycApple = 1'b1; 
-
-            // if (drawBodyCount > 1)
-            //     drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
-            // else
-            //     begin
-            //     drawBodyCount <= 4;
-				
-					
-									 
+						 
          //   if (drawBodyCount == 1)
                 //begin
 
@@ -561,44 +534,44 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 
 endmodule
 
-// module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
-//     parameter maxLength = 6;
-//     parameter DIM = 10;
-//     input enable;
-//     input [7:0] Xhead;
-// 	input [6:0] Yhead;
-//     input [8 * maxLength * DIM -1 :0] XSnakeLong;
-//     input [7 * maxLength * DIM -1 :0] YSnakeLong;
-//     input [3:0] currentLength;
-//     output reg hit;
+module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
+    parameter maxLength = 6;
+    parameter DIM = 10;
+    input enable;
+    input [7:0] Xhead;
+	input [6:0] Yhead;
+    input [8 * maxLength * DIM -1 :0] XSnakeLong;
+    input [7 * maxLength * DIM -1 :0] YSnakeLong;
+    input [3:0] currentLength;
+    output reg hit;
 
-//     integer i;
+    integer i;
 
-//     always @* begin
-//         if (enable)
-//         begin
-//             hit = 1'b0; // Default: no collision
-//             if (currentLength >= 2)
-//             begin
+    always @* begin
+        if (enable)
+        begin
+            hit = 1'b0; // Default: no collision
+            if (currentLength >= 2)
+            begin
 
-//             // Loop through all segments of the active snake length
-//             for (i = 4; i < maxLength; i = i + 1) begin
-//                 if (i <= currentLength)
-//                 begin
-//                 // Check for collisions with each body segment
-//                 if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
-//                     (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
-//                     (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-//                     (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
-//                     hit = 1'b1; // Collision detected
-//                 end
-//                 end
-//             end
+            // Loop through all segments of the active snake length
+            for (i = 4; i < maxLength; i = i + 1) begin
+                if (i <= currentLength)
+                begin
+                // Check for collisions with each body segment
+                if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
+                    (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
+                    (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
+                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+                    hit = 1'b1; // Collision detected
+                end
+                end
+            end
 
-//             end
-//         end
-//     end 
-// endmodule 
+            end
+        end
+    end 
+endmodule 
 
 
 
@@ -662,72 +635,72 @@ endmodule
 
 
 
-module ifhit (
-    enable,
-    Xhead,
-    Yhead,
-    XSnakeLong,
-    YSnakeLong,
-    currentLength,
-    hit, 
-    move_left, move_up, move_down, move_right
-);
-    parameter maxLength = 6;
-    parameter DIM = 10;
-    input enable;
-    input [7:0] Xhead;
-    input [6:0] Yhead;
-    input [8 * maxLength * DIM - 1 : 0] XSnakeLong;
-    input [7 * maxLength * DIM - 1 : 0] YSnakeLong;
-    input [3:0] currentLength;
-    input move_left, move_up, move_down, move_right; // 00 = right, 01 = left, 10 = up, 11 = down
-    output reg hit;
+// module ifhit (
+//     enable,
+//     Xhead,
+//     Yhead,
+//     XSnakeLong,
+//     YSnakeLong,
+//     currentLength,
+//     hit, 
+//     move_left, move_up, move_down, move_right
+// );
+//     parameter maxLength = 6;
+//     parameter DIM = 10;
+//     input enable;
+//     input [7:0] Xhead;
+//     input [6:0] Yhead;
+//     input [8 * maxLength * DIM - 1 : 0] XSnakeLong;
+//     input [7 * maxLength * DIM - 1 : 0] YSnakeLong;
+//     input [3:0] currentLength;
+//     input move_left, move_up, move_down, move_right; // 00 = right, 01 = left, 10 = up, 11 = down
+//     output reg hit;
 
-    integer i;
+//     integer i;
 
-    always @* begin
-        if (enable) begin
-            hit = 1'b0; // Default: no collision
-            if (currentLength >= 2) begin
-                // Loop through all segments of the active snake length
-                for (i = 3; i < maxLength; i = i + 1) begin
-                    if (i <= currentLength) begin
-                        // Extract the current body segment position
-                        reg [7:0] XBody;
-                        reg [6:0] YBody;
-                        XBody = XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8];
-                        YBody = YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7];
+//     always @* begin
+//         if (enable) begin
+//             hit = 1'b0; // Default: no collision
+//             if (currentLength >= 2) begin
+//                 // Loop through all segments of the active snake length
+//                 for (i = 3; i < maxLength; i = i + 1) begin
+//                     if (i <= currentLength) begin
+//                         // Extract the current body segment position
+//                         reg [7:0] XBody;
+//                         reg [6:0] YBody;
+//                         XBody = XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8];
+//                         YBody = YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7];
                         
-                        // Check collision based on direction
+//                         // Check collision based on direction
 
-                if (move_up)
-                begin
-                    if ((Yhead == YBody + DIM) &&
-                        (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
-                        hit = 1'b1;
-                end
-                if (move_down)
-                begin
-                    if ((Yhead + DIM == YBody) &&
-                        (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
-                        hit = 1'b1;
-                end
-                if (move_left)
-                begin
-                    if ((Xhead == XBody + DIM) &&
-                        (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
-                        hit = 1'b1;
-                end
-                if (move_right)
-                begin
-                    if ((Xhead + DIM == XBody) &&
-                        (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
-                        hit = 1'b1;
-                end
+//                 if (move_up)
+//                 begin
+//                     if ((Yhead == YBody + DIM) &&
+//                         (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_down)
+//                 begin
+//                     if ((Yhead + DIM == YBody) &&
+//                         (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_left)
+//                 begin
+//                     if ((Xhead == XBody + DIM) &&
+//                         (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_right)
+//                 begin
+//                     if ((Xhead + DIM == XBody) &&
+//                         (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
+//                         hit = 1'b1;
+//                 end
     
-                    end
-                end
-            end
-        end
-    end
-endmodule
+//                     end
+//                 end
+//             end
+//         end
+//     end
+// endmodule
