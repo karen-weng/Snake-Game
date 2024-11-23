@@ -194,7 +194,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     hex7seg D1 (y_Q[1], HEX1);
     hex7seg D2 (y_Q[2], HEX2);
     hex7seg D3 (y_Q[3], HEX3);
-    // hex7seg D4 (y_Q[4], HEX4);
+    hex7seg D4 (y_Q[4], HEX4);
 
     // movement
     always @ (*)
@@ -298,6 +298,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				LxcApple = 1'b1; 
 				EycApple = 1'b1; 
 				end
+
+            Binital:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
+
+            Cinital:  begin Lxc = 1'b1; Eyc = 1'b1; end
 
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
 
