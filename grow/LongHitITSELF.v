@@ -186,6 +186,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
     //     defparam U6.n = 2;
 
+
+    hex7seg S0 (y_Q[0], HEX[0]);
+    hex7seg S1 (y_Q[1], HEX[1]);
+    hex7seg S2 (y_Q[2], HEX[2]);
+    hex7seg S3 (y_Q[3], HEX[3]);
+    hex7seg S4 (y_Q[4], HEX[4]);
+
     // movement
     always @ (*)
     begin
@@ -682,7 +689,7 @@ module ifhit (
             hit = 1'b0; // Default: no collision
             if (currentLength >= 2) begin
                 // Loop through all segments of the active snake length
-                for (i = 4; i < maxLength; i = i + 1) begin
+                for (i = 3; i < maxLength; i = i + 1) begin
                     if (i <= currentLength) begin
                         // Extract the current body segment position
                         reg [7:0] XBody;
