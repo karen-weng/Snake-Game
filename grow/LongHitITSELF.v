@@ -40,7 +40,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     output VGA_BLANK_N;
     output VGA_SYNC_N;
     output VGA_CLK;	
-    output HEX0, HEX1, HEX2, HEX3, HEX4;
+    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4;
 
     wire [7:0] VGA_X; 
     wire [6:0] VGA_Y;  
