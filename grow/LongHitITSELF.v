@@ -8,12 +8,15 @@
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4);
 	
-    parameter A = 4'b0000, B = 4'b0001, C = 4'b0010, D = 4'b0011; 
-    parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
-    parameter drawed = 4'b1000, erased = 4'b1001;
-    parameter BB = 4'b1010, CC = 4'b1011; 
-	parameter shift = 4'b1100, endGameState=4'b1101; 
-    parameter hitState = 4'b1110; 
+    parameter A = 5'b00000, B = 5'b00001, C = 5'b00010, D = 5'b00011; 
+    parameter E = 5'b00100, F = 5'b00101, G = 5'b00110, H = 5'b00111; 
+    parameter drawed = 5'b01000, erased = 5'b01001;
+    parameter BB = 5'b01010, CC = 5'b01011; 
+	parameter shift = 5'b01100, endGameState=5'b01101; 
+    parameter hitState = 5'b01110; 
+    parameter waitKey = 5'b01111; 
+    parameter Binital = 5'b10000, Cinital = 5'b10001;
+
 
 
     parameter XSCREEN = 160, YSCREEN = 120;
@@ -135,7 +138,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg Tdir_X;
     reg Tdir_Y;
-    reg [3:0] y_Q, Y_D;
+    reg [4:0] y_Q, Y_D;
 	
 	assign colour = SW[2:0];
 
@@ -233,24 +236,34 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = B;
 
 
-            B:  if (XC != XDIM-1) Y_D = B;    // draw
+            Binital:  if (XC != XDIM-1) Y_D = Binital;    // draw snake inital
+                else Y_D = Cinital;
+            Cinital:  if (YC != YDIM-1) Y_D = Binital;
+                else Y_D = waitKey;
+
+            waitKey: if (KEY[0] || KEY[1] || KEY[2] || KEY[3]) Y_D = B;
+                    else Y_D = waitKey;
+
+            B:  if (XC != XDIM-1) Y_D = B;    // draw snake
                 else Y_D = C;
             C:  if (YC != YDIM-1) Y_D = B;
                 else Y_D = drawed;
-            drawed: if (drawBodyCount > 1) Y_D = B;
+
+            drawed: if (drawBodyCount > 1) Y_D = B; // loads
                     else Y_D = D;
+
 			D:  if (!sync) Y_D = D;
                 else Y_D = E;
             E:  if (XC != XDIM-1) Y_D = E;    // erase
                 else Y_D = F;
             F:  if (YC != YDIM-1) Y_D = E;
                 else Y_D = erased; 
-            erased: if (drawBodyCount > 1) Y_D = E;
+            erased: if (drawBodyCount > 1) Y_D = E; // loads
                     else Y_D = hitState;
             hitState: Y_D = G;
             G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGameState; end
             H:  Y_D = shift; // move
-			shift:  Y_D = BB; // shiftreg
+			shift:  Y_D = B; // shiftreg
 			endGameState: Y_D = endGameState; 
         endcase
 
