@@ -61,6 +61,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg [7:0] XApple;
     reg [6:0] YApple;
+    reg eatApple;
+	reg[1:0]found;
 
     //assign XApple = 8'd30;
     //assign YApple = 7'd30;
@@ -348,7 +350,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					found=2'b11; 
 					eatApple=1'b0;
 					//counter
-					if (!endgame) counter<=counter+1;
+					if (!gameEnded) counter<=counter+1;
 					end	
 					
 				if (found==2'b11)
