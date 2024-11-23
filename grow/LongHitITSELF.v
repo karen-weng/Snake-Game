@@ -68,7 +68,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg move_left, move_up, move_down, move_right;
 
-    parameter maxLength = 4;
+    parameter maxLength = 6;
     // wire maxLength;
     // assign maxLength = 2;
 
@@ -89,7 +89,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // end
 
     wire [3:0] currentLength;
-    assign currentLength = 4;
+    assign currentLength = 6;
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
@@ -357,7 +357,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         if (!SW[9])
 				begin
             y_Q <= 1'b0;
-            drawBodyCount <= 4;
+            drawBodyCount <= maxLength;
 				end
         else
             begin
@@ -371,7 +371,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					 
 					
             else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
-                drawBodyCount <= 4;
+                drawBodyCount <= maxLength;
                 
             end
 
@@ -504,7 +504,7 @@ endmodule
 
 module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
 	parameter n = 8;
-    parameter maxLength = 4;
+    parameter maxLength = 6;
     parameter DIM = 10;
 	 
     input clk;
@@ -537,7 +537,7 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 endmodule
 
 module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
-    parameter maxLength = 4;
+    parameter maxLength = 6;
     parameter DIM = 10;
     input enable;
     input [7:0] Xhead;
