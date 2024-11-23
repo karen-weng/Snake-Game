@@ -352,7 +352,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         if (!SW[9])
 				begin
             y_Q <= 1'b0;
-            drawBodyCount <= 6;
+            drawBodyCount <= currentLength;
 				end
         else
             begin
@@ -366,7 +366,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					 
 					
             else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == hitState))
-                drawBodyCount <= 6;
+                drawBodyCount <= currentLength;
                 
             end
 
