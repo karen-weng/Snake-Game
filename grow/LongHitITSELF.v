@@ -265,6 +265,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         LxcApple = 1'b0; LycApple = 1'b0;
 		Eshift = 1'b0;
         hitEnable = 1'b0;
+        gameEnded = 1'b0;
 
         case (y_Q)
             A:  begin 
