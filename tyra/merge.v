@@ -6,7 +6,7 @@
 *   KEY[3] to start the animation. 
 */
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
-				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4);
+				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
 	
     parameter A = 5'b00000, B = 5'b00001, C = 5'b00010, D = 5'b00011; 
     parameter E = 5'b00100, F = 5'b00101, G = 5'b00110, H = 5'b00111; 
@@ -43,7 +43,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     output VGA_BLANK_N;
     output VGA_SYNC_N;
     output VGA_CLK;	
-    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4;
+    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
 
     wire [7:0] VGA_X; 
     wire [6:0] VGA_Y;  
@@ -169,8 +169,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
     //     defparam U6.n = 2;
 
+    hex7seg D0 (y_Q[0], HEX1);
+    hex7seg D1 (y_Q[1], HEX2);
+    hex7seg D2 (y_Q[2], HEX3);
+    hex7seg D3 (y_Q[3], HEX4);
+    hex7seg D4 (y_Q[4], HEX5);
 
- decimal_display a1(counter[3:0], HEX0); 
+    decimal_display a1(counter[3:0], HEX0); 
     // movement
     always @ (*)
     begin
