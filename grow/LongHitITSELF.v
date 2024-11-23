@@ -524,10 +524,11 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
                       P3 = {n{1'b0}};
 
 
+
     always @(posedge clk) 
     begin
         if (reset) begin
-           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}};
+           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P3}}, {DIM{P3}}};
 			  //data_out <= 0;
         end
         
