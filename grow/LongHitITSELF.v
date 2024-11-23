@@ -211,7 +211,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
                 else Y_D = CC;
             CC:  if (YCApple != YDIM-1) Y_D = BB;
-                else Y_D = B;
+                else Y_D = Binital;
 
 
             Binital:  if (XC != XDIM-1) Y_D = Binital;    // draw snake inital
