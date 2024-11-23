@@ -553,7 +553,50 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 
 endmodule
 
-module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
+// module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
+//     parameter maxLength = 6;
+//     parameter DIM = 10;
+//     input enable;
+//     input [7:0] Xhead;
+// 	input [6:0] Yhead;
+//     input [8 * maxLength * DIM -1 :0] XSnakeLong;
+//     input [7 * maxLength * DIM -1 :0] YSnakeLong;
+//     input [3:0] currentLength;
+//     output reg hit;
+
+//     integer i;
+
+//     always @* begin
+//         if (enable)
+//         begin
+//             hit = 1'b0; // Default: no collision
+//             if (currentLength >= 2)
+//             begin
+
+//             // Loop through all segments of the active snake length
+//             for (i = 4; i < maxLength; i = i + 1) begin
+//                 if (i <= currentLength)
+//                 begin
+//                 // Check for collisions with each body segment
+//                 if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
+//                     (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
+//                     (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
+//                     (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+//                     hit = 1'b1; // Collision detected
+//                 end
+//                 end
+//             end
+
+//             end
+//         end
+//     end
+        
+// endmodule 
+
+
+
+
+module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
     parameter maxLength = 6;
     parameter DIM = 10;
     input enable;
@@ -562,35 +605,50 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
     input [8 * maxLength * DIM -1 :0] XSnakeLong;
     input [7 * maxLength * DIM -1 :0] YSnakeLong;
     input [3:0] currentLength;
+    input move_left, move_up, move_down, move_right;
     output reg hit;
 
     integer i;
 
     always @* begin
-        if (enable)
-        begin
-            hit = 1'b0; // Default: no collision
-            if (currentLength >= 2)
-            begin
+        hit = 1'b0; // Default: no collision
+        if (enable && currentLength >= 2) begin
+            for (i = 2; i <= currentLength; i = i + 1) begin
+                // Extract segment coordinates
+                wire [7:0] x_segment = XSnakeLong[(maxLength - i) * 8 - 1 -: 8];
+                wire [6:0] y_segment = YSnakeLong[(maxLength - i) * 7 - 1 -: 7];
 
-            // Loop through all segments of the active snake length
-            for (i = 4; i < maxLength; i = i + 1) begin
-                if (i <= currentLength)
+                if (move_up)
                 begin
-                // Check for collisions with each body segment
-                if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
-                    (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
-                    (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
-                    hit = 1'b1; // Collision detected
+                    if ((Yhead == y_segment + DIM) &&
+                        (Xhead < x_segment + DIM) &&
+                        (Xhead + DIM > x_segment))
+                        hit = 1'b1;
                 end
+                if (move_down)
+                begin
+                    if ((Yhead + DIM == y_segment) &&
+                        (Xhead < x_segment + DIM) &&
+                        (Xhead + DIM > x_segment))
+                        hit = 1'b1;
                 end
-            end
+                if (move_left)
+                begin
+                    if ((Xhead == x_segment + DIM) &&
+                        (Yhead < y_segment + DIM) &&
+                        (Yhead + DIM > y_segment))
+                        hit = 1'b1;
+                end
+                if (move_right)
+                begin
+                    if ((Xhead + DIM == x_segment) &&
+                        (Yhead < y_segment + DIM) &&
+                        (Yhead + DIM > y_segment))
+                        hit = 1'b1;
+                end
+
 
             end
         end
     end
-        
-endmodule 
-
-
+endmodule
