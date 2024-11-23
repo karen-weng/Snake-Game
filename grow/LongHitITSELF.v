@@ -147,7 +147,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
-        
+
 
     UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);
         defparam U3.n = 8;
@@ -542,11 +542,11 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, 
         if (enable)
         begin
             hit = 1'b0; // Default: no collision
-            if (currentLength >= 2)
-            begin
+            // if (currentLength >= 2)
+            // begin
 
             // Loop through all segments of the active snake length
-            for (i = 4; i < maxLength; i = i + 1) begin
+            for (i = 3; i < maxLength; i = i + 1) begin
                 if (i <= currentLength)
                 begin
                 // Check for collisions with each body segment
@@ -559,7 +559,7 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, 
                 end
             end
 
-            end
+            // end
         end
     end 
 endmodule 
