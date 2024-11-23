@@ -187,11 +187,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //     defparam U6.n = 2;
 
 
-    hex7seg H0 (y_Q[0], HEX[0]);
-    hex7seg H1 (y_Q[1], HEX[1]);
-    hex7seg H2 (y_Q[2], HEX[2]);
-    hex7seg H3 (y_Q[3], HEX[3]);
-    hex7seg H4 (y_Q[4], HEX[4]);
+    hex7seg D0 (y_Q[0], HEX[0]);
+    hex7seg D1 (y_Q[1], HEX[1]);
+    hex7seg D2 (y_Q[2], HEX[2]);
+    hex7seg D3 (y_Q[3], HEX[3]);
+    hex7seg D4 (y_Q[4], HEX[4]);
 
     // movement
     always @ (*)
