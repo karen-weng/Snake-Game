@@ -392,17 +392,11 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @(*) begin
         VGA_X_reg = XSnakeLong[8 * XDIM * (maxLength - drawBodyCount + 1) -1 -: 8] + XC;
         VGA_Y_reg = YSnakeLong[7 * YDIM * (maxLength - drawBodyCount + 1) -1 -: 7] + YC;
-        // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
-        // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
-    end
+        end
 
-    // assign VGA_X = VGA_X_reg;
-    // assign VGA_Y = VGA_Y_reg;
 
     assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : VGA_X_reg;
     assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : VGA_Y_reg;
-    // assign VGA_X = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;
-    // assign VGA_Y = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;
 
     // assign VGA_X = X + XC;
     // assign VGA_Y = Y + YC;
