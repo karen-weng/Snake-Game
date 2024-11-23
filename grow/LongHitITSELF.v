@@ -192,12 +192,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     hex7seg D1 (y_Q[1], HEX1);
     hex7seg D2 (y_Q[2], HEX2);
     hex7seg D3 (y_Q[3], HEX3);
-    hex7seg D4 (y_Q[4], HEX4);
+    // hex7seg D4 (y_Q[4], HEX4);
 
     // movement
     always @ (*)
     begin
-    if (SW[9]) 
+    if (~SW[9]) 
         begin
             move_right = 1'b0; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
         end
