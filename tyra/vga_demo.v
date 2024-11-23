@@ -339,8 +339,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     Ex = 1'b1;
                     Xdir = 1'b1;
                     end
-                end
-					 	 eatApple = ((X < XApple + XDIM) && (X + XDIM > XApple)) && ((Y < YApple + YDIM) && (Y + YDIM > YApple));
+                
+				
+                eatApple = ((X < XApple + XDIM) && (X + XDIM > XApple)) && ((Y < YApple + YDIM) && (Y + YDIM > YApple));
 					//eatApple=((Y<YApple&&(Y+YDIM>YApple))||((Y<YApple+7'd4)&&(Y>YApple)))||((X<XApple&&(X+XDIM>XApple))||((X<XApple+8'd4)&&(X>XApple)));
 				if (eatApple)
 					begin
@@ -348,11 +349,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					eatApple=1'b0;
 					//counter
 					if (!endgame) counter<=counter+1;
-					end
-					
+					end	
 					
 				if (found==2'b11)
-				begin
+				    begin
 					case(XApple)
 					8'd30: XApple=8'd10; 
 					8'd10: XApple=8'd70;
@@ -374,13 +374,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					found=2'b10; 
 					//eatApple=1'b0; 
 			//counter<=counter+1; 
-				end
+				    end
 				else if (found==2'b00)
 					begin
 					XApple=8'd30; 
 					YApple=7'd30; 
 					found=2'b10; 
 					end
+            end
+
             shift: Eshift = 1'b1;
                  //i call my state EndGame and my current length counter   
             endGameState: begin plot =1'b1; VGA_COLOR=3'b101; Exc=1'b1; Eyc=(XC==XDIM-1);end
