@@ -15,7 +15,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 	parameter shift = 5'b01100, endGameState=5'b01101; 
     parameter hitState = 5'b01110; 
     parameter waitKey = 5'b01111; 
-    parameter Binital = 5'b10000, Cinital = 5'b10001;
+    parameter Binital = 5'b10000, Cinital = 5'b10001, drawedInital = 5'b10010;
 
 
 
@@ -217,7 +217,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             Binital:  if (XC != XDIM-1) Y_D = Binital;    // draw snake inital
                 else Y_D = Cinital;
             Cinital:  if (YC != YDIM-1) Y_D = Binital;
-                else Y_D = waitKey;
+                else Y_D = drawedInital;
+
+            drawedInital: Y_D = waitKey;
 
             waitKey: if (KEY[0] || KEY[1] || KEY[2] || KEY[3]) Y_D = B;
                     else Y_D = waitKey;
@@ -281,6 +283,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             Cinital:  begin Lxc = 1'b1; Eyc = 1'b1; end
 
+            drawedInital: Lyc = 1'b1;
+
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
 
             C:  begin Lxc = 1'b1; Eyc = 1'b1; end
@@ -302,7 +306,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             hitState: hitEnable = 1'b1;
            G:   begin 
                 // gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
-                //gameEnded = hit;
+                gameEnded = hit;
 
                 end
 
@@ -315,22 +319,22 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
                 if (move_left)
                     begin
-                    Ex <= 1'b1;
+                    Ex = 1'b1;
                     Xdir = 1'b0;
                     end
                 else if (move_up)
                     begin
-                    Ey <= 1'b1;
+                    Ey = 1'b1;
                     Ydir = 1'b0;
                     end
                 else if (move_down)
                     begin
-                    Ey <= 1'b1;
+                    Ey = 1'b1;
                     Ydir = 1'b1;
                     end
                 else if (move_right)
                     begin
-                    Ex <= 1'b1;
+                    Ex = 1'b1;
                     Xdir = 1'b1;
                     end
                 end
@@ -353,6 +357,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         else
             begin
             y_Q <= Y_D;
+				
+				if (y_Q == Binital)
+                begin
+            // if (drawBodyCount >= 1)  
+                drawBodyCount <= 1;
+                end
 				
             if ((y_Q == drawed && Y_D == B) || (y_Q == erased && Y_D == E))
                 begin
