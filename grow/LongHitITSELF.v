@@ -24,6 +24,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter X1 = 8'd80, Y1 = 7'd70;
     parameter X2 = 8'd80, Y2 = 7'd80;
     parameter X3 = 8'd80, Y3 = 7'd90;
+    parameter X4 = 8'd80, Y4 = 7'd100;
+    parameter X5 = 8'd80, Y5 = 7'd110;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -115,6 +117,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam S0.P1 = X1;
         defparam S0.P2 = X2;
         defparam S0.P3 = X3;
+        defparam S0.P4 = X4;
+        defparam S0.P5 = X5;
 		  
 		  
     shift_register_move_snake S1 (CLOCK_50, Eshift, SW[5], YSnakeLong, Y, YSnakeLong);
@@ -123,6 +127,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam S1.P1 = Y1;
         defparam S1.P2 = Y2;
         defparam S1.P3 = Y3;
+        defparam S1.P4 = Y4;
+        defparam S1.P5 = Y5;
 
     ifhit H1 (hitEnable, X, Y, XSnakeLong, YSnakeLong, currentLength, hit);
 
@@ -521,14 +527,16 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     parameter [n - 1 : 0] P0 = {n{1'b0}}, 
                       P1 = {n{1'b0}}, 
                       P2 = {n{1'b0}}, 
-                      P3 = {n{1'b0}};
+                      P3 = {n{1'b0}},
+                      P4 = {n{1'b0}},
+                      P5 = {n{1'b0}};
 
 
 
     always @(posedge clk) 
     begin
         if (reset) begin
-           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P3}}, {DIM{P3}}};
+           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
 			  //data_out <= 0;
         end
         
