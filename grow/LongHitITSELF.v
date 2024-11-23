@@ -367,7 +367,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         if (!SW[9])
 				begin
             y_Q <= 1'b0;
-            drawBodyCount <= maxLength;
+            drawBodyCount <= 6;
 				end
         else
             begin
@@ -380,8 +380,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
 					 
 					
-            else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
-                drawBodyCount <= maxLength;
+            else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == hitState))
+                drawBodyCount <= 6;
                 
             end
 
@@ -571,7 +571,7 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
 
             // Loop through all segments of the active snake length
             for (i = 1; i < maxLength; i = i + 1) begin
-                if (i + 2 <= currentLength)
+                if (i <= currentLength)
                 begin
                 // Check for collisions with each body segment
                 if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
