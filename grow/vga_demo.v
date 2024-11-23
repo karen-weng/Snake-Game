@@ -6,13 +6,16 @@
 *   KEY[3] to start the animation. 
 */
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
-				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK);
+				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4);
 	
     parameter A = 4'b0000, B = 4'b0001, C = 4'b0010, D = 4'b0011; 
     parameter E = 4'b0100, F = 4'b0101, G = 4'b0110, H = 4'b0111; 
     parameter drawed = 4'b1000, erased = 4'b1001;
     parameter BB = 4'b1010, CC = 4'b1011; 
-	parameter shift = 4'b1100, endGame=4'b1101; 
+	parameter shift = 4'b1100, endGameState=4'b1101; 
+    parameter hitState = 4'b1110; 
+
+
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
     parameter XDIM = 10, YDIM = 10;
@@ -21,6 +24,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter X1 = 8'd80, Y1 = 7'd70;
     parameter X2 = 8'd80, Y2 = 7'd80;
     parameter X3 = 8'd80, Y3 = 7'd90;
+    parameter X4 = 8'd80, Y4 = 7'd100;
+    parameter X5 = 8'd80, Y5 = 7'd110;
     parameter ALT = 3'b000; // alternate object color
     parameter K = 20; // animation speed: use 20 for hardware, 2 for ModelSim
 
@@ -35,6 +40,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     output VGA_BLANK_N;
     output VGA_SYNC_N;
     output VGA_CLK;	
+    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4;
 
     wire [7:0] VGA_X; 
     wire [6:0] VGA_Y;  
@@ -68,26 +74,28 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     reg move_left, move_up, move_down, move_right;
 
-    parameter maxLength = 4;
+    parameter maxLength = 6;
     // wire maxLength;
     // assign maxLength = 2;
 
-    reg [3:0] currentLength;
+    // reg [3:0] currentLength;
     wire hit;
+    reg hitEnable;
 
-    always @(posedge SW[4] or posedge SW[5]) 
-        begin
-        if (SW[5]) 
-            begin
-            currentLength <= 4'b1; // Reset to zero when sw[5] is high
-            end 
-        else if (currentLength < 4'b1111) 
-            begin
-            currentLength <= currentLength + 1; // Increment on the posedge of sw[4]
-            end
-    end
+    // always @(posedge SW[4] or posedge SW[5]) 
+    //     begin
+    //     if (SW[5]) 
+    //         begin
+    //         currentLength <= 4'b1; // Reset to zero when sw[5] is high
+    //         end 
+    //     else if (currentLength < 4'b1111) 
+    //         begin
+    //         currentLength <= currentLength + 1; // Increment on the posedge of sw[4]
+    //         end
+    // end
 
-
+    wire [3:0] currentLength;
+    assign currentLength = 6;
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
@@ -110,6 +118,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam S0.P1 = X1;
         defparam S0.P2 = X2;
         defparam S0.P3 = X3;
+        defparam S0.P4 = X4;
+        defparam S0.P5 = X5;
 		  
 		  
     shift_register_move_snake S1 (CLOCK_50, Eshift, SW[5], YSnakeLong, Y, YSnakeLong);
@@ -118,7 +128,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam S1.P1 = Y1;
         defparam S1.P2 = Y2;
         defparam S1.P3 = Y3;
+        defparam S1.P4 = Y4;
+        defparam S1.P5 = Y5;
 
+    ifhit H1 (hitEnable, X, Y, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
 
     reg Tdir_X;
     reg Tdir_Y;
@@ -173,10 +186,22 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
     //     defparam U6.n = 2;
 
+
+    hex7seg D0 (y_Q[0], HEX0);
+    hex7seg D1 (y_Q[1], HEX1);
+    hex7seg D2 (y_Q[2], HEX2);
+    hex7seg D3 (y_Q[3], HEX3);
+    // hex7seg D4 (y_Q[4], HEX4);
+
     // movement
     always @ (*)
     begin
+    // if (SW[5]) 
+    //     begin
+    //         move_right = 1'b0; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
+    //     end
         // Direction control based on key inputs
+	
     if (~KEY[0]) // Move Right
         begin
             move_right = 1'b1; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
@@ -222,11 +247,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             F:  if (YC != YDIM-1) Y_D = E;
                 else Y_D = erased; 
             erased: if (drawBodyCount > 1) Y_D = E;
-                    else Y_D = G;
-            G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGame; end
+                    else Y_D = hitState;
+            hitState: Y_D = G;
+            G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGameState; end
             H:  Y_D = shift; // move
 			shift:  Y_D = BB; // shiftreg
-			endGame: Y_D = endGame; 
+			endGameState: Y_D = endGameState; 
         endcase
 
 
@@ -239,6 +265,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     	ExcApple = 1'b0; EycApple = 1'b0;
         LxcApple = 1'b0; LycApple = 1'b0;
 		Eshift = 1'b0;
+        hitEnable = 1'b0;
+        gameEnded = 1'b0;
 
         case (y_Q)
             A:  begin 
@@ -277,70 +305,45 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
 
             erased: Lyc = 1'b1; 
-           G:   begin
-			  
-					 ifhit H1 (X, Y, XSnakeLong, YSnakeLong, currentLength, hit);
-                gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
+            hitState: hitEnable = 1'b1;
+           G:   begin 
+                // gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
+                //gameEnded = hit;
+
                 end
-                // Tdir_Y = (Y == 7'd0) || (Y == YSCREEN- YDIM);  // Flip Ydir at vertical edges
-                // Tdir_X = (X == 8'd0) || (X == XSCREEN- XDIM);  // Flip Xdir at horizontal edges
-
-                // Adjust Tdir_X and Tdir_Y based on the active direction flags
-                // if (move_right)
-                //     Tdir_X = (X < XSCREEN - XDIM) ? 1'b1 : 1'b0; // Move right, stop at screen edge
-                // else if (move_left)
-                //     Tdir_X = (X > 0) ? 1'b0 : 1'b1; // Move left, stop at screen edge
-                // else
-                //     Tdir_X = 1'b0; // Default to no horizontal movement
-
-                // if (move_down)
-                //     Tdir_Y = (Y < YSCREEN - YDIM) ? 1'b1 : 1'b0; // Move down, stop at screen edge
-                // else if (move_up)
-                //     Tdir_Y = (Y > 0) ? 1'b0 : 1'b1; // Move up, stop at screen edge
-                // else
-                //     Tdir_Y = 1'b0; // Default to no vertical movement
-       //     end
 
             H:  
             begin
                 LycApple = 1'b1; 
-
-            // if (drawBodyCount > 1)
-            //     drawBodyCount <= drawBodyCount - 1;  // Move to draw the next square
-            // else
-            //     begin
-            //     drawBodyCount <= 4;
-				
-					
-									 
+						 
          //   if (drawBodyCount == 1)
                 //begin
 
                 if (move_left)
                     begin
-                    Ex <= 1'b1;
+                    Ex = 1'b1;
                     Xdir = 1'b0;
                     end
                 else if (move_up)
                     begin
-                    Ey <= 1'b1;
+                    Ey = 1'b1;
                     Ydir = 1'b0;
                     end
                 else if (move_down)
                     begin
-                    Ey <= 1'b1;
+                    Ey = 1'b1;
                     Ydir = 1'b1;
                     end
                 else if (move_right)
                     begin
-                    Ex <= 1'b1;
+                    Ex = 1'b1;
                     Xdir = 1'b1;
                     end
                 end
 					 
             shift: Eshift = 1'b1;
                     
-            endGame: VGA_COLOR=3'b111; 
+            endGameState: VGA_COLOR=3'b111; 
 					
 
           //  end
@@ -351,7 +354,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         if (!SW[9])
 				begin
             y_Q <= 1'b0;
-            drawBodyCount <= 4;
+            drawBodyCount <= currentLength;
 				end
         else
             begin
@@ -364,8 +367,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 end
 					 
 					
-            else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == G))
-                drawBodyCount <= 4;
+            else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == hitState))
+                drawBodyCount <= currentLength;
                 
             end
 
@@ -375,8 +378,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg [7:0] VGA_X_reg, VGA_Y_reg;
 
     always @(*) begin
-        VGA_X_reg = XSnakeLong[8 * XDIM * drawBodyCount -1 -: 8] + XC;
-        VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
+        VGA_X_reg = XSnakeLong[8 * XDIM * (maxLength - drawBodyCount + 1) -1 -: 8] + XC;
+        VGA_Y_reg = YSnakeLong[7 * YDIM * (maxLength - drawBodyCount + 1) -1 -: 7] + YC;
         // VGA_X_reg = XSnakeLong[8 * drawBodyCount - 1 : 8 * drawBodyCount - 1 - 8] + XC;  // Dynamic part-select
         // VGA_Y_reg = YSnakeLong[7 * drawBodyCount - 1 : 7 * drawBodyCount - 1 - 7] + YC;  // Dynamic part-select
     end
@@ -498,7 +501,7 @@ endmodule
 
 module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
 	parameter n = 8;
-    parameter maxLength = 4;
+    parameter maxLength = 6;
     parameter DIM = 10;
 	 
     input clk;
@@ -511,13 +514,16 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     parameter [n - 1 : 0] P0 = {n{1'b0}}, 
                       P1 = {n{1'b0}}, 
                       P2 = {n{1'b0}}, 
-                      P3 = {n{1'b0}};
+                      P3 = {n{1'b0}},
+                      P4 = {n{1'b0}},
+                      P5 = {n{1'b0}};
+
 
 
     always @(posedge clk) 
     begin
         if (reset) begin
-           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}};
+           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
 			  //data_out <= 0;
         end
         
@@ -530,47 +536,175 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
 
 endmodule
 
-module ifhit (Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit);
-    parameter maxLength = 4;
+module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
+    parameter maxLength = 6;
     parameter DIM = 10;
+    input enable;
     input [7:0] Xhead;
-	 input [6:0] Yhead;
+	input [6:0] Yhead;
     input [8 * maxLength * DIM -1 :0] XSnakeLong;
     input [7 * maxLength * DIM -1 :0] YSnakeLong;
     input [3:0] currentLength;
+    input move_left, move_up, move_down, move_right;
     output reg hit;
 
     integer i;
 
-always @(*) begin
-    hit = 1'b0; // Default: no collision
+    always @* begin
+	 
+        if (enable)
+        begin
+            hit = 1'b0; // Default: no collision
+            if (currentLength >= 2)
+            begin
 
-    // Loop through all segments of the active snake length
-    for (i = 1; i < currentLength; i = i + 1) begin
-        // Check for collisions with each body segment
-        if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
-            (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
-            (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-            (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
-            hit = 1'b1; // Collision detected
+            // Loop through all segments of the active snake length
+            for (i = 4; i < maxLength; i = i + 1) begin
+                if (i <= currentLength)
+                begin
+                // Check for collisions with each body segment
+                if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
+                    (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
+                    (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
+                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
+                    hit = 1'b1; // Collision detected
+                end
+                end
+            end
+
+            end
         end
-    end
-end
-
+    end 
 endmodule 
 
-// XSnakeLong[8 * XDIM * i -1 -: 8]
-// [7 * YDIM * i -1 -: 7]
-
-//         VGA_Y_reg = YSnakeLong[7 * YDIM * drawBodyCount -1 -: 7] + YC;
-//     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
-//     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
 
 
 
+// module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
+//     parameter maxLength = 6;
+//     parameter DIM = 10;
+//     input enable;
+//     input [7:0] Xhead;
+// 	input [6:0] Yhead;
+//     input [8 * maxLength * DIM -1 :0] XSnakeLong;
+//     input [7 * maxLength * DIM -1 :0] YSnakeLong;
+//     input [3:0] currentLength;
+//     input move_left, move_up, move_down, move_right;
+//     output reg hit;
+
+//     integer i;
+
+//     always @* begin
+//         hit = 1'b0; // Default: no collision
+//         if (enable && currentLength >= 2) begin
+//             for (i = 2; i <= currentLength; i = i + 1) begin
+//                 // Extract segment coordinates
+//                 wire [7:0] x_segment = XSnakeLong[(maxLength - i) * 8 - 1 -: 8];
+//                 wire [6:0] y_segment = YSnakeLong[(maxLength - i) * 7 - 1 -: 7];
+
+//                 if (move_up)
+//                 begin
+//                     if ((Yhead == y_segment + DIM) &&
+//                         (Xhead < x_segment + DIM) &&
+//                         (Xhead + DIM > x_segment))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_down)
+//                 begin
+//                     if ((Yhead + DIM == y_segment) &&
+//                         (Xhead < x_segment + DIM) &&
+//                         (Xhead + DIM > x_segment))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_left)
+//                 begin
+//                     if ((Xhead == x_segment + DIM) &&
+//                         (Yhead < y_segment + DIM) &&
+//                         (Yhead + DIM > y_segment))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_right)
+//                 begin
+//                     if ((Xhead + DIM == x_segment) &&
+//                         (Yhead < y_segment + DIM) &&
+//                         (Yhead + DIM > y_segment))
+//                         hit = 1'b1;
+//                 end
+
+
+//             end
+//         end
+//     end
+// endmodule
 
 
 
+// module ifhit (
+//     enable,
+//     Xhead,
+//     Yhead,
+//     XSnakeLong,
+//     YSnakeLong,
+//     currentLength,
+//     hit, 
+//     move_left, move_up, move_down, move_right
+// );
+//     parameter maxLength = 6;
+//     parameter DIM = 10;
+//     input enable;
+//     input [7:0] Xhead;
+//     input [6:0] Yhead;
+//     input [8 * maxLength * DIM - 1 : 0] XSnakeLong;
+//     input [7 * maxLength * DIM - 1 : 0] YSnakeLong;
+//     input [3:0] currentLength;
+//     input move_left, move_up, move_down, move_right; // 00 = right, 01 = left, 10 = up, 11 = down
+//     output reg hit;
 
+//     integer i;
 
+//     always @* begin
+//         if (enable) begin
+//             hit = 1'b0; // Default: no collision
+//             if (currentLength >= 2) begin
+//                 // Loop through all segments of the active snake length
+//                 for (i = 3; i < maxLength; i = i + 1) begin
+//                     if (i <= currentLength) begin
+//                         // Extract the current body segment position
+//                         reg [7:0] XBody;
+//                         reg [6:0] YBody;
+//                         XBody = XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8];
+//                         YBody = YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7];
+                        
+//                         // Check collision based on direction
 
+//                 if (move_up)
+//                 begin
+//                     if ((Yhead == YBody + DIM) &&
+//                         (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_down)
+//                 begin
+//                     if ((Yhead + DIM == YBody) &&
+//                         (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_left)
+//                 begin
+//                     if ((Xhead == XBody + DIM) &&
+//                         (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_right)
+//                 begin
+//                     if ((Xhead + DIM == XBody) &&
+//                         (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
+//                         hit = 1'b1;
+//                 end
+    
+//                     end
+//                 end
+//             end
+//         end
+//     end
+// endmodule
