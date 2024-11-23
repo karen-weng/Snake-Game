@@ -130,7 +130,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam S1.P4 = Y4;
         defparam S1.P5 = Y5;
 
-    ifhit H1 (hitEnable, X, Y, XSnakeLong, YSnakeLong, currentLength, hit);
+    ifhit H1 (hitEnable, X, Y, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
 
 
     reg Tdir_X;
@@ -589,65 +589,136 @@ endmodule
 
 //             end
 //         end
-//     end
-        
+//     end 
 // endmodule 
 
 
 
 
-module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
+// module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
+//     parameter maxLength = 6;
+//     parameter DIM = 10;
+//     input enable;
+//     input [7:0] Xhead;
+// 	input [6:0] Yhead;
+//     input [8 * maxLength * DIM -1 :0] XSnakeLong;
+//     input [7 * maxLength * DIM -1 :0] YSnakeLong;
+//     input [3:0] currentLength;
+//     input move_left, move_up, move_down, move_right;
+//     output reg hit;
+
+//     integer i;
+
+//     always @* begin
+//         hit = 1'b0; // Default: no collision
+//         if (enable && currentLength >= 2) begin
+//             for (i = 2; i <= currentLength; i = i + 1) begin
+//                 // Extract segment coordinates
+//                 wire [7:0] x_segment = XSnakeLong[(maxLength - i) * 8 - 1 -: 8];
+//                 wire [6:0] y_segment = YSnakeLong[(maxLength - i) * 7 - 1 -: 7];
+
+//                 if (move_up)
+//                 begin
+//                     if ((Yhead == y_segment + DIM) &&
+//                         (Xhead < x_segment + DIM) &&
+//                         (Xhead + DIM > x_segment))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_down)
+//                 begin
+//                     if ((Yhead + DIM == y_segment) &&
+//                         (Xhead < x_segment + DIM) &&
+//                         (Xhead + DIM > x_segment))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_left)
+//                 begin
+//                     if ((Xhead == x_segment + DIM) &&
+//                         (Yhead < y_segment + DIM) &&
+//                         (Yhead + DIM > y_segment))
+//                         hit = 1'b1;
+//                 end
+//                 if (move_right)
+//                 begin
+//                     if ((Xhead + DIM == x_segment) &&
+//                         (Yhead < y_segment + DIM) &&
+//                         (Yhead + DIM > y_segment))
+//                         hit = 1'b1;
+//                 end
+
+
+//             end
+//         end
+//     end
+// endmodule
+
+
+
+module ifhit (
+    enable,
+    Xhead,
+    Yhead,
+    XSnakeLong,
+    YSnakeLong,
+    currentLength,
+    hit, 
+    move_left, move_up, move_down, move_right
+);
     parameter maxLength = 6;
     parameter DIM = 10;
     input enable;
     input [7:0] Xhead;
-	input [6:0] Yhead;
-    input [8 * maxLength * DIM -1 :0] XSnakeLong;
-    input [7 * maxLength * DIM -1 :0] YSnakeLong;
+    input [6:0] Yhead;
+    input [8 * maxLength * DIM - 1 : 0] XSnakeLong;
+    input [7 * maxLength * DIM - 1 : 0] YSnakeLong;
     input [3:0] currentLength;
-    input move_left, move_up, move_down, move_right;
+    input move_left, move_up, move_down, move_right; // 00 = right, 01 = left, 10 = up, 11 = down
     output reg hit;
 
     integer i;
 
     always @* begin
-        hit = 1'b0; // Default: no collision
-        if (enable && currentLength >= 2) begin
-            for (i = 2; i <= currentLength; i = i + 1) begin
-                // Extract segment coordinates
-                wire [7:0] x_segment = XSnakeLong[(maxLength - i) * 8 - 1 -: 8];
-                wire [6:0] y_segment = YSnakeLong[(maxLength - i) * 7 - 1 -: 7];
+        if (enable) begin
+            hit = 1'b0; // Default: no collision
+            if (currentLength >= 2) begin
+                // Loop through all segments of the active snake length
+                for (i = 4; i < maxLength; i = i + 1) begin
+                    if (i <= currentLength) begin
+                        // Extract the current body segment position
+                        reg [7:0] XBody;
+                        reg [6:0] YBody;
+                        XBody = XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8];
+                        YBody = YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7];
+                        
+                        // Check collision based on direction
 
                 if (move_up)
                 begin
-                    if ((Yhead == y_segment + DIM) &&
-                        (Xhead < x_segment + DIM) &&
-                        (Xhead + DIM > x_segment))
+                    if ((Yhead == YBody + DIM) &&
+                        (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
                         hit = 1'b1;
                 end
                 if (move_down)
                 begin
-                    if ((Yhead + DIM == y_segment) &&
-                        (Xhead < x_segment + DIM) &&
-                        (Xhead + DIM > x_segment))
+                    if ((Yhead + DIM == YBody) &&
+                        (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
                         hit = 1'b1;
                 end
                 if (move_left)
                 begin
-                    if ((Xhead == x_segment + DIM) &&
-                        (Yhead < y_segment + DIM) &&
-                        (Yhead + DIM > y_segment))
+                    if ((Xhead == XBody + DIM) &&
+                        (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
                         hit = 1'b1;
                 end
                 if (move_right)
                 begin
-                    if ((Xhead + DIM == x_segment) &&
-                        (Yhead < y_segment + DIM) &&
-                        (Yhead + DIM > y_segment))
+                    if ((Xhead + DIM == XBody) &&
+                        (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
                         hit = 1'b1;
                 end
-
-
+    
+                    end
+                end
             end
         end
     end
