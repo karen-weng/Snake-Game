@@ -189,6 +189,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // movement
     always @ (*)
     begin
+    if (SW[9]) 
+        begin
+            move_right = 1'b0; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
+        end
         // Direction control based on key inputs
     if (~KEY[0]) // Move Right
         begin
