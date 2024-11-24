@@ -226,9 +226,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             waitKey: if (KEY[0] || KEY[1] || KEY[2] || KEY[3]) Y_D = B;
                     else Y_D = waitKey;
 
-            B:  if (XC != XDIM-1) Y_D = B;    // draw snake
+            B:  if (XC != XDimApp-1) Y_D = B;    // draw snake
                 else Y_D = C;
-            C:  if (YC != YDIM-1) Y_D = B;
+            C:  if (YC != YDimApp-1) Y_D = B;
                 else Y_D = drawed;
 
             drawed: if (drawBodyCount > 1) Y_D = B; // loads
@@ -242,7 +242,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = erased; 
             erased: if (drawBodyCount > 1) Y_D = E; // loads
                     else Y_D = hitState;
-                    
+
             hitState: Y_D = G;
             G:  if (!gameEnded)Y_D = H;	
                 else Y_D = endGameState;
