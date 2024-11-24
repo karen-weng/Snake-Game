@@ -614,14 +614,14 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     always @(posedge clk) 
     begin
         if (reset) begin
-           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
+           data_out = {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
 			  //data_out <= 0;
         end
         
         if (enable) begin
             // left is the head
             // add new data to the front the rest follows
-            data_out <= {data_in, data[n * maxLength * DIM -1 : n ]};
+            data_out = {data_in, data[n * maxLength * DIM -1 : n ]};
         end
     end
 
