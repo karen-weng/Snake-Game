@@ -471,8 +471,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @(*) begin
         if (y_Q == Binital)
             begin 
-            VGA_X_reg = XSnakeLong[8 * XDIM * (maxLength) -1 -: 8] + XC;
-            VGA_Y_reg = YSnakeLong[7 * YDIM * (maxLength) -1 -: 7] + YC;
+            VGA_X_reg = X0 + XC;
+            VGA_Y_reg = Y0 + YC;
             end
         else 
             begin
