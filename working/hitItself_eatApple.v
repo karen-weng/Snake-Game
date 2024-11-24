@@ -211,8 +211,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             A:  if (!go || !sync) Y_D = A;
                 else Y_D = BBinital;
 					
-
-
             BBinital:  if (XCApple != XDimApp-1) Y_D = BBinital;    // draw apple
                 else Y_D = CCinital;
             CCinital:  if (YCApple != YDimApp-1) Y_D = BBinital;
