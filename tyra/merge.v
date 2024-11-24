@@ -286,9 +286,26 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 Lyc = 1'b1; 
                 LxcApple = 1'b1; 
                 LycApple = 1'b1;
-					 XApple=8'd30;
-					YApple=7'd30;
+				XApple=8'd30;
+				YApple=7'd30;
                 end
+
+            BBinital:  begin 
+				ExcApple = 1'b1; 
+				VGA_COLOR = 3'b100; 
+                plot = 1'b1; 
+				end // color a pixel
+
+            CCinital:  begin 
+				LxcApple = 1'b1; 
+				EycApple = 1'b1; 
+				end
+
+            Binital:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
+
+            Cinital:  begin Lxc = 1'b1; Eyc = 1'b1; end
+
+            drawedInital: Lyc = 1'b1;
 
             BB:  begin 
 				ExcApple = 1'b1; 
@@ -300,12 +317,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				LxcApple = 1'b1; 
 				EycApple = 1'b1; 
 				end
-
-            Binital:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
-
-            Cinital:  begin Lxc = 1'b1; Eyc = 1'b1; end
-
-            drawedInital: Lyc = 1'b1;
 
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
 
