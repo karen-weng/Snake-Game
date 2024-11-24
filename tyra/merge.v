@@ -398,7 +398,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             shift: Eshift = 1'b1;
                  //i call my state EndGame and my current length counter   
-            endGameState: begin plot =1'b1; VGA_COLOR=3'b101; Exc=1'b1; Eyc=(XC==XDIM-1);end
+            endGameState: 
+                begin 
+                    plot =1'b1; 
+                    VGA_COLOR=3'b101; 
+                    Exc=1'b1; 
+                    Eyc=(XC==XDIM-1);
+                
+                end
 					
 
           //  end
