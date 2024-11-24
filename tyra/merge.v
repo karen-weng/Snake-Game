@@ -15,8 +15,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 	parameter shift = 5'b01100, endGameState=5'b01101; 
     parameter hitState = 5'b01110; 
     parameter waitKey = 5'b01111; 
-    parameter Binital = 5'b10000, Cinital = 5'b10001, drawedInital = 5'b10010, EE=5'b10011, FF=5'b10100;
-
+    parameter Binital = 5'b10000, Cinital = 5'b10001, drawedInital = 5'b10010;
+    parameter EE = 5'b10011, FF = 5'b10100;
 
 
     parameter XSCREEN = 160, YSCREEN = 120;
@@ -242,16 +242,22 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = erased; 
             erased: if (drawBodyCount > 1) Y_D = E; // loads
                     else Y_D = hitState;
+                    
             hitState: Y_D = G;
-            G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGameState; end
-            H: if (!eatApple) Y_D = shift;
-			else Y_D=EE;	// move
+            G:  if (!gameEnded)Y_D = H;	
+                else Y_D = endGameState;
+
+            H:  if (!eatApple) Y_D = shift;
+			    else Y_D = EE;	// move
+
 			shift:  Y_D = B; // shiftreg
-			endGameState: Y_D = endGameState; 
+			
 			EE: if (XCApple != XDimApp-1) Y_D = EE;   
                 else Y_D = FF;
             FF: if (YCApple != YDimApp-1) Y_D = EE;
-                else Y_D = BB;
+                else Y_D = shift;
+
+            endGameState: Y_D = endGameState; 
         endcase
 
 
