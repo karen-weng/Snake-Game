@@ -305,6 +305,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             drawedInital: Lyc = 1'b1;
 
+            waitKey: begin 
+                Lxc = 1'b1; 
+                Lyc = 1'b1; 
+                LxcApple = 1'b1; 
+                LycApple = 1'b1;
+                end
+
             BB:  begin 
 				ExcApple = 1'b1; 
 				VGA_COLOR = 3'b100; 
