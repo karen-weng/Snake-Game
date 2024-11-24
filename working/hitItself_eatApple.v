@@ -475,8 +475,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     end
 
 
-    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : VGA_X_reg;
-    assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : VGA_Y_reg;
+    assign VGA_X = (y_Q == BB || y_Q == BBinital) ? (XApple + XCApple) : VGA_X_reg;
+    assign VGA_Y = (y_Q == BB || y_Q == BBinital) ? (YApple + YCApple) : VGA_Y_reg;
 
     // assign VGA_X = X + XC;
     // assign VGA_Y = Y + YC;
