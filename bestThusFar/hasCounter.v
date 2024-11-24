@@ -448,12 +448,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             begin
             y_Q <= Y_D;
 				
-				//if (y_Q == Binital)
-            //    begin
-            // if (drawBodyCount >= 1)  
-              //  drawBodyCount <= 1;
-              //  end
-				
             if ((y_Q == drawed && Y_D == B) || (y_Q == erased && Y_D == E))
                 begin
             // if (drawBodyCount >= 1)  
