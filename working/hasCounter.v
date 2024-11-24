@@ -104,7 +104,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
-	reg [3:0] currentLength; 
+	reg [3:0] counter; 
 
    // assign XSnakeLong = {X0, X1, X2, X3};
  //   assign YSnakeLong = {Y0, Y1, Y2, Y3};
@@ -176,7 +176,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     hex7seg D3 (y_Q[3], HEX4);
     hex7seg D4 (y_Q[4], HEX5);
 
-    decimal_display a1(currentLength[3:0], HEX0); 
+    decimal_display a1(counter[3:0], HEX0); 
     // movement
     always @ (*)
     begin
@@ -384,7 +384,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					found=2'b11; 
 					eatApple=1'b0;
 					//counter
-					if (!gameEnded) currentLength <= currentLength + 1;
+					if (!gameEnded) counter <= counter + 1;
 					end	
 					
 				if (found==2'b11)
@@ -678,5 +678,4 @@ module decimal_display (C, Display);
     assign Display[5] = ~C[2] & C[1] | C[1] & C[0] | ~C[3] & ~C[2] & ~C[1] & C[0]; 
     assign Display[6] = ~C[3] & ~C[2] & ~C[1] | C[2] & C[1] & C[0];
 endmodule
-
 

@@ -6,7 +6,7 @@
 *   KEY[3] to start the animation. 
 */
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
-				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4);
+				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
 	
     parameter A = 5'b00000, B = 5'b00001, C = 5'b00010, D = 5'b00011; 
     parameter E = 5'b00100, F = 5'b00101, G = 5'b00110, H = 5'b00111; 
@@ -16,12 +16,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     parameter hitState = 5'b01110; 
     parameter waitKey = 5'b01111; 
     parameter Binital = 5'b10000, Cinital = 5'b10001, drawedInital = 5'b10010;
-
+    parameter EE = 5'b10011, FF = 5'b10100;
+    parameter BBinital = 5'b10101, CCinital = 5'b10110; 
 
 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
-    parameter XDIM = 10, YDIM = 10;
+    parameter XDIM = 10, YDIM = 10, YDimApp=4, XDimApp=4;
 
     parameter X0 = 8'd80, Y0 = 7'd60;
     parameter X1 = 8'd80, Y1 = 7'd70;
@@ -43,7 +44,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     output VGA_BLANK_N;
     output VGA_SYNC_N;
     output VGA_CLK;	
-    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4;
+    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
 
     wire [7:0] VGA_X; 
     wire [6:0] VGA_Y;  
@@ -59,12 +60,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire go, sync;
     reg Ex, Ey, Lxc, Lyc, Exc, Eyc;
 
-    wire [7:0] XApple;
-    wire [6:0] YApple;
+    reg [7:0] XApple;
+    reg [6:0] YApple;
+    reg eatApple;
+	reg[1:0]found;
 
-    assign XApple = 8'd30;
-    assign YApple = 7'd30;
-        
+    //assign XApple = 8'd30;
+    //assign YApple = 7'd30;
     wire [7:0] XCApple;
     wire [6:0] YCApple;
     reg LxcApple, LycApple, ExcApple, EycApple;
@@ -97,11 +99,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //         end
     // end
 
-    wire [3:0] currentLength;
-    assign currentLength = 6;
+    // wire [3:0] currentLength;
+    // assign currentLength = 6;
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
+	reg [3:0] currentLength; 
 
    // assign XSnakeLong = {X0, X1, X2, X3};
  //   assign YSnakeLong = {Y0, Y1, Y2, Y3};
@@ -155,9 +158,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam U4.n = 7;
 
     UpDn_count U6 (8'd0, CLOCK_50, SW[9], ExcApple, LxcApple, 1'b1, XCApple);
-        defparam U6.n = 8;
+        defparam U6.n = 4;
     UpDn_count U7 (7'd0, CLOCK_50, SW[9], EycApple, LycApple, 1'b1, YCApple);
-        defparam U7.n = 7;
+        defparam U7.n = 4;
 
     UpDn_count U5 ({K{1'b0}}, CLOCK_50, SW[9], 1'b1, 1'b0, 1'b1, slow);
         defparam U5.n = K;
@@ -167,13 +170,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
     //     defparam U6.n = 2;
 
+    hex7seg D0 (y_Q[0], HEX1);
+    hex7seg D1 (y_Q[1], HEX2);
+    hex7seg D2 (y_Q[2], HEX3);
+    hex7seg D3 (y_Q[3], HEX4);
+    hex7seg D4 (y_Q[4], HEX5);
 
-    hex7seg D0 (y_Q[0], HEX0);
-    hex7seg D1 (y_Q[1], HEX1);
-    hex7seg D2 (y_Q[2], HEX2);
-    hex7seg D3 (y_Q[3], HEX3);
-    hex7seg D4 (y_Q[4], HEX4);
-
+    decimal_display a1(currentLength[3:0], HEX0); 
     // movement
     always @ (*)
     begin
@@ -206,13 +209,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @ (*)
         case (y_Q)
             A:  if (!go || !sync) Y_D = A;
-                else Y_D = BB;
-
-            BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
-                else Y_D = CC;
-            CC:  if (YCApple != YDIM-1) Y_D = BB;
+                else Y_D = BBinital;
+					
+            BBinital:  if (XCApple != XDimApp-1) Y_D = BBinital;    // draw apple
+                else Y_D = CCinital;
+            CCinital:  if (YCApple != YDimApp-1) Y_D = BBinital;
                 else Y_D = Binital;
-
 
             Binital:  if (XC != XDIM-1) Y_D = Binital;    // draw snake inital
                 else Y_D = Cinital;
@@ -221,8 +223,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             drawedInital: Y_D = waitKey;
 
-            waitKey: if (KEY[0] || KEY[1] || KEY[2] || KEY[3]) Y_D = B;
+            waitKey: if (~KEY[0] || ~KEY[1] || ~KEY[2] || ~KEY[3]) Y_D = BB;
                     else Y_D = waitKey;
+
+            BB:  if (XCApple != XDimApp-1) Y_D = BB;    // draw apple
+                else Y_D = CC;
+            CC:  if (YCApple != YDimApp-1) Y_D = BB;
+                else Y_D = B;
 
             B:  if (XC != XDIM-1) Y_D = B;    // draw snake
                 else Y_D = C;
@@ -240,11 +247,22 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 else Y_D = erased; 
             erased: if (drawBodyCount > 1) Y_D = E; // loads
                     else Y_D = hitState;
+
             hitState: Y_D = G;
-            G:  begin if (!gameEnded)Y_D = H;	else Y_D = endGameState; end
-            H:  Y_D = shift; // move
-			shift:  Y_D = B; // shiftreg
-			endGameState: Y_D = endGameState; 
+            G:  if (!gameEnded)Y_D = H;	
+                else Y_D = endGameState;
+
+            H:  if (!eatApple) Y_D = shift;
+			    else Y_D = EE;	// move
+
+			EE: if (XCApple != XDimApp-1) Y_D = EE;   
+                else Y_D = FF;
+            FF: if (YCApple != YDimApp-1) Y_D = EE;
+                else Y_D = shift;
+
+            shift:  Y_D = BB; // shiftreg
+
+            endGameState: Y_D = endGameState; 
         endcase
 
 
@@ -266,6 +284,32 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 Lyc = 1'b1; 
                 LxcApple = 1'b1; 
                 LycApple = 1'b1;
+				XApple = 8'd30;
+				YApple = 7'd30;
+                end
+
+            BBinital:  begin 
+				ExcApple = 1'b1; 
+				VGA_COLOR = 3'b100; 
+                plot = 1'b1; 
+				end // color a pixel
+
+            CCinital:  begin 
+				LxcApple = 1'b1; 
+				EycApple = 1'b1; 
+				end
+
+            Binital:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
+
+            Cinital:  begin Lxc = 1'b1; Eyc = 1'b1; end
+
+            drawedInital: Lyc = 1'b1;
+
+            waitKey: begin 
+                Lxc = 1'b1; 
+                Lyc = 1'b1; 
+                LxcApple = 1'b1; 
+                LycApple = 1'b1;
                 end
 
             BB:  begin 
@@ -278,12 +322,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				LxcApple = 1'b1; 
 				EycApple = 1'b1; 
 				end
-
-            Binital:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
-
-            Cinital:  begin Lxc = 1'b1; Eyc = 1'b1; end
-
-            drawedInital: Lyc = 1'b1;
 
             B:  begin Exc = 1'b1; plot = 1'b1; end   // color a pixel
 
@@ -337,11 +375,60 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     Ex = 1'b1;
                     Xdir = 1'b1;
                     end
-                end
-					 
+                
+				
+                eatApple = ((X < XApple + XDIM) && (X + XDIM > XApple)) && ((Y < YApple + YDIM) && (Y + YDIM > YApple));
+					//eatApple=((Y<YApple&&(Y+YDIM>YApple))||((Y<YApple+7'd4)&&(Y>YApple)))||((X<XApple&&(X+XDIM>XApple))||((X<XApple+8'd4)&&(X>XApple)));
+				if (eatApple)
+					begin
+					found=2'b11; 
+					eatApple=1'b0;
+					//counter
+					if (!gameEnded) currentLength <= currentLength + 1;
+					end	
+					
+				if (found==2'b11)
+				    begin
+					case(XApple)
+					8'd30: XApple=8'd10; 
+					8'd10: XApple=8'd70;
+					8'd70: XApple=8'd60;
+					8'd90: XApple=8'd20;
+					8'd20: XApple=8'd50;
+					8'd50: XApple=8'd80;
+					default: XApple=8'd10; 
+					endcase
+					case(YApple)
+					7'd30: YApple=7'd20; 
+					7'd20: YApple=7'd90;
+					7'd90: YApple=7'd100;
+					7'd100: YApple=7'd80;
+					7'd80: YApple=7'd10;
+					7'd10: YApple=7'd50;
+					default: YApple=7'd20; 
+					endcase
+					found=2'b10; 
+					//eatApple=1'b0; 
+			//counter<=counter+1; 
+				    end
+				else if (found==2'b00)
+					begin
+					XApple=8'd30; 
+					YApple=7'd30; 
+					found=2'b10; 
+					end
+            end
+
             shift: Eshift = 1'b1;
-                    
-            endGameState: VGA_COLOR=3'b111; 
+                 //i call my state EndGame and my current length counter   
+            endGameState: 
+                begin 
+                    plot =1'b1; 
+                    VGA_COLOR=3'b101; 
+                    Exc=1'b1; 
+                    Eyc=(XC==XDIM-1);
+                
+                end
 					
 
           //  end
@@ -382,13 +469,21 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg [7:0] VGA_X_reg, VGA_Y_reg;
 
     always @(*) begin
-        VGA_X_reg = XSnakeLong[8 * XDIM * (maxLength - drawBodyCount + 1) -1 -: 8] + XC;
-        VGA_Y_reg = YSnakeLong[7 * YDIM * (maxLength - drawBodyCount + 1) -1 -: 7] + YC;
-        end
+        if (y_Q == Binital)
+            begin 
+            VGA_X_reg = X0 + XC;
+            VGA_Y_reg = Y0 + YC;
+            end
+        else 
+            begin
+            VGA_X_reg = XSnakeLong[8 * XDIM * (maxLength - drawBodyCount + 1) -1 -: 8] + XC;
+            VGA_Y_reg = YSnakeLong[7 * YDIM * (maxLength - drawBodyCount + 1) -1 -: 7] + YC;
+            end
+    end
 
 
-    assign VGA_X = (y_Q == BB) ? (XApple + XCApple) : VGA_X_reg;
-    assign VGA_Y = (y_Q == BB) ? (YApple + YCApple) : VGA_Y_reg;
+    assign VGA_X = (y_Q == BB || y_Q == BBinital) ? (XApple + XCApple) : VGA_X_reg;
+    assign VGA_Y = (y_Q == BB || y_Q == BBinital) ? (YApple + YCApple) : VGA_Y_reg;
 
     // assign VGA_X = X + XC;
     // assign VGA_Y = Y + YC;
@@ -516,13 +611,10 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
                       P4 = {n{1'b0}},
                       P5 = {n{1'b0}};
 
-
-
     always @(posedge clk) 
     begin
         if (reset) begin
            data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
-			  //data_out <= 0;
         end
         
         if (enable) begin
@@ -556,7 +648,7 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, 
             // begin
 
             // Loop through all segments of the active snake length
-            for (i = 3; i < maxLength; i = i + 1) begin
+            for (i = 2; i < maxLength; i = i + 1) begin
                 if (i <= currentLength)
                 begin
                 // Check for collisions with each body segment
@@ -574,134 +666,16 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, 
     end 
 endmodule 
 
+module decimal_display (C, Display); 
+    input [3:0] C; 
+    output [6:0] Display; 
 
+    assign Display[0] = ~C[3] & ~C[2] & ~C[1] & C[0] | ~C[3] & C[2] & ~C[1] & ~C[0];
+    assign Display[1] = ~C[3] & C[2] & ~C[1] & C[0] | ~C[3] & C[2] & C[1] & ~C[0];
+    assign Display[2] = ~C[3] & ~C[2] & C[1] & ~C[0];
+    assign Display[3] = ~C[2] & ~C[1] & C[0] | ~C[3] & C[2] & ~C[1] & ~C[0] | ~C[3] & C[2] & C[1] & C[0];
+    assign Display[4] = ~C[1] & C[2] | ~C[2] & C[0] | ~C[3] & C[2] & C[0]; 
+    assign Display[5] = ~C[2] & C[1] | C[1] & C[0] | ~C[3] & ~C[2] & ~C[1] & C[0]; 
+    assign Display[6] = ~C[3] & ~C[2] & ~C[1] | C[2] & C[1] & C[0];
+endmodule
 
-
-// module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, move_left, move_up, move_down, move_right);
-//     parameter maxLength = 6;
-//     parameter DIM = 10;
-//     input enable;
-//     input [7:0] Xhead;
-// 	input [6:0] Yhead;
-//     input [8 * maxLength * DIM -1 :0] XSnakeLong;
-//     input [7 * maxLength * DIM -1 :0] YSnakeLong;
-//     input [3:0] currentLength;
-//     input move_left, move_up, move_down, move_right;
-//     output reg hit;
-
-//     integer i;
-
-//     always @* begin
-//         hit = 1'b0; // Default: no collision
-//         if (enable && currentLength >= 2) begin
-//             for (i = 2; i <= currentLength; i = i + 1) begin
-//                 // Extract segment coordinates
-//                 wire [7:0] x_segment = XSnakeLong[(maxLength - i) * 8 - 1 -: 8];
-//                 wire [6:0] y_segment = YSnakeLong[(maxLength - i) * 7 - 1 -: 7];
-
-//                 if (move_up)
-//                 begin
-//                     if ((Yhead == y_segment + DIM) &&
-//                         (Xhead < x_segment + DIM) &&
-//                         (Xhead + DIM > x_segment))
-//                         hit = 1'b1;
-//                 end
-//                 if (move_down)
-//                 begin
-//                     if ((Yhead + DIM == y_segment) &&
-//                         (Xhead < x_segment + DIM) &&
-//                         (Xhead + DIM > x_segment))
-//                         hit = 1'b1;
-//                 end
-//                 if (move_left)
-//                 begin
-//                     if ((Xhead == x_segment + DIM) &&
-//                         (Yhead < y_segment + DIM) &&
-//                         (Yhead + DIM > y_segment))
-//                         hit = 1'b1;
-//                 end
-//                 if (move_right)
-//                 begin
-//                     if ((Xhead + DIM == x_segment) &&
-//                         (Yhead < y_segment + DIM) &&
-//                         (Yhead + DIM > y_segment))
-//                         hit = 1'b1;
-//                 end
-
-
-//             end
-//         end
-//     end
-// endmodule
-
-
-
-// module ifhit (
-//     enable,
-//     Xhead,
-//     Yhead,
-//     XSnakeLong,
-//     YSnakeLong,
-//     currentLength,
-//     hit, 
-//     move_left, move_up, move_down, move_right
-// );
-//     parameter maxLength = 6;
-//     parameter DIM = 10;
-//     input enable;
-//     input [7:0] Xhead;
-//     input [6:0] Yhead;
-//     input [8 * maxLength * DIM - 1 : 0] XSnakeLong;
-//     input [7 * maxLength * DIM - 1 : 0] YSnakeLong;
-//     input [3:0] currentLength;
-//     input move_left, move_up, move_down, move_right; // 00 = right, 01 = left, 10 = up, 11 = down
-//     output reg hit;
-
-//     integer i;
-
-//     always @* begin
-//         if (enable) begin
-//             hit = 1'b0; // Default: no collision
-//             if (currentLength >= 2) begin
-//                 // Loop through all segments of the active snake length
-//                 for (i = 3; i < maxLength; i = i + 1) begin
-//                     if (i <= currentLength) begin
-//                         // Extract the current body segment position
-//                         reg [7:0] XBody;
-//                         reg [6:0] YBody;
-//                         XBody = XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8];
-//                         YBody = YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7];
-                        
-//                         // Check collision based on direction
-
-//                 if (move_up)
-//                 begin
-//                     if ((Yhead == YBody + DIM) &&
-//                         (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
-//                         hit = 1'b1;
-//                 end
-//                 if (move_down)
-//                 begin
-//                     if ((Yhead + DIM == YBody) &&
-//                         (Xhead < XBody + DIM) && (Xhead + DIM > XBody))
-//                         hit = 1'b1;
-//                 end
-//                 if (move_left)
-//                 begin
-//                     if ((Xhead == XBody + DIM) &&
-//                         (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
-//                         hit = 1'b1;
-//                 end
-//                 if (move_right)
-//                 begin
-//                     if ((Xhead + DIM == XBody) &&
-//                         (Yhead < YBody + DIM) && (Yhead + DIM > YBody))
-//                         hit = 1'b1;
-//                 end
-    
-//                     end
-//                 end
-//             end
-//         end
-//     end
-// endmodule
