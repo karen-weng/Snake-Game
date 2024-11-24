@@ -289,6 +289,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 LycApple = 1'b1;
 				XApple = 8'd30;
 				YApple = 7'd30;
+                counter = 1;
                 end
 
             BBinital:  begin 
@@ -380,7 +381,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     end
                 
 				
-                eatApple = ((X < XApple + XDIM) && (X + XDIM > XApple)) && ((Y < YApple + YDIM) && (Y + YDIM > YApple));
+                eatApple = ((X < XApple + XDimApp) && (X + XDIM > XApple)) && ((Y < YApple + YDimApp) && (Y + YDIM > YApple));
 					//eatApple=((Y<YApple&&(Y+YDIM>YApple))||((Y<YApple+7'd4)&&(Y>YApple)))||((X<XApple&&(X+XDIM>XApple))||((X<XApple+8'd4)&&(X>XApple)));
 				if (eatApple)
 					begin
