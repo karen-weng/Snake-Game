@@ -210,9 +210,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             A:  if (!go || !sync) Y_D = A;
                 else Y_D = BB;
 					
-            BB:  if (XCApple != XDIM-1) Y_D = BB;    // draw apple
+            BB:  if (XCApple != XDimApp-1) Y_D = BB;    // draw apple
                 else Y_D = CC;
-            CC:  if (YCApple != YDIM-1) Y_D = BB;
+            CC:  if (YCApple != YDimApp-1) Y_D = BB;
                 else Y_D = Binital;
 
 
@@ -226,9 +226,9 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             waitKey: if (KEY[0] || KEY[1] || KEY[2] || KEY[3]) Y_D = B;
                     else Y_D = waitKey;
 
-            B:  if (XC != XDimApp-1) Y_D = B;    // draw snake
+            B:  if (XC != XDIM-1) Y_D = B;    // draw snake
                 else Y_D = C;
-            C:  if (YC != YDimApp-1) Y_D = B;
+            C:  if (YC != YDIM-1) Y_D = B;
                 else Y_D = drawed;
 
             drawed: if (drawBodyCount > 1) Y_D = B; // loads
