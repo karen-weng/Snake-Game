@@ -99,12 +99,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     //         end
     // end
 
-    wire [3:0] currentLength;
-    assign currentLength = 6;
+    // wire [3:0] currentLength;
+    // assign currentLength = 6;
     reg [3:0] drawBodyCount; 
     wire [8 * maxLength * XDIM -1 :0] XSnakeLong;
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
-	reg [3:0]counter; 
+	reg [3:0] currentLength; 
 
    // assign XSnakeLong = {X0, X1, X2, X3};
  //   assign YSnakeLong = {Y0, Y1, Y2, Y3};
@@ -176,7 +176,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     hex7seg D3 (y_Q[3], HEX4);
     hex7seg D4 (y_Q[4], HEX5);
 
-    decimal_display a1(counter[3:0], HEX0); 
+    decimal_display a1(currentLength[3:0], HEX0); 
     // movement
     always @ (*)
     begin
@@ -384,7 +384,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					found=2'b11; 
 					eatApple=1'b0;
 					//counter
-					if (!gameEnded) counter<=counter+1;
+					if (!gameEnded) currentLength <= currentLength + 1;
 					end	
 					
 				if (found==2'b11)
@@ -614,14 +614,13 @@ module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);
     always @(posedge clk) 
     begin
         if (reset) begin
-           data_out = {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
-			  //data_out <= 0;
+           data_out <= {{DIM{P0}}, {DIM{P1}}, {DIM{P2}}, {DIM{P3}}, {DIM{P4}}, {DIM{P5}}};
         end
         
         if (enable) begin
             // left is the head
             // add new data to the front the rest follows
-            data_out = {data_in, data[n * maxLength * DIM -1 : n ]};
+            data_out <= {data_in, data[n * maxLength * DIM -1 : n ]};
         end
     end
 
