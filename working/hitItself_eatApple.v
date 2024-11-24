@@ -22,7 +22,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
     parameter XSCREEN = 160, YSCREEN = 120;
     //parameter XDIM = XSCREEN>>1, YDIM = 1;
-    parameter XDIM = 10, YDIM = 10, YDimApp=7'd4, XDimApp=8'd4;
+    parameter XDIM = 10, YDIM = 10, YDimApp=4, XDimApp=4;
 
     parameter X0 = 8'd80, Y0 = 7'd60;
     parameter X1 = 8'd80, Y1 = 7'd70;
@@ -284,8 +284,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 Lyc = 1'b1; 
                 LxcApple = 1'b1; 
                 LycApple = 1'b1;
-				XApple=8'd30;
-				YApple=7'd30;
+				XApple = 8'd30;
+				YApple = 7'd30;
                 end
 
             BBinital:  begin 
