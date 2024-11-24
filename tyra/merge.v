@@ -223,7 +223,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             drawedInital: Y_D = waitKey;
 
-            waitKey: if (KEY[0] || KEY[1] || KEY[2] || KEY[3]) Y_D = B;
+            waitKey: if (~KEY[0] || ~KEY[1] || ~KEY[2] || ~KEY[3]) Y_D = B;
                     else Y_D = waitKey;
 
             B:  if (XC != XDIM-1) Y_D = B;    // draw snake
