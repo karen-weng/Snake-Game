@@ -270,10 +270,13 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     always @ (*)
     begin
         // default assignments
-        Lxc = 1'b0; Lyc = 1'b0; Exc = 1'b0; Eyc = 1'b0; VGA_COLOR = colour; plot = 1'b0;
-        Ex = 1'b0; Ey = 1'b0; Tdir_Y = 1'b0; Tdir_X = 1'b0;
-    	ExcApple = 1'b0; EycApple = 1'b0;
+        VGA_COLOR = colour; plot = 1'b0;
+        Lxc = 1'b0; Lyc = 1'b0; 
+        Exc = 1'b0; Eyc = 1'b0;  
         LxcApple = 1'b0; LycApple = 1'b0;
+    	ExcApple = 1'b0; EycApple = 1'b0;
+        Ex = 1'b0; Ey = 1'b0; 
+
 		Eshift = 1'b0;
         hitEnable = 1'b0;
         gameEnded = 1'b0;
