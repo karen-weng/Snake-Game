@@ -137,12 +137,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam U5.n = K;
     assign sync = (slow == 0);
 
-    // hex7seg D0 (y_Q[0], HEX1);
-    // hex7seg D1 (y_Q[1], HEX2);
-    // hex7seg D2 (y_Q[2], HEX3);
-    // hex7seg D3 (y_Q[3], HEX4);
-    // hex7seg D4 (y_Q[4], HEX5);
-
     decimal_display a1(counter[3:0], HEX0); 
 
     // movement
