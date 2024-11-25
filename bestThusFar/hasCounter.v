@@ -1,9 +1,6 @@
 /*
-*   This code draws a horizontal line on the screen and then moves the line up and down. The
-*   line "bounces" off the top and bottom of the screen and reverses directions. To run the demo
-*   first press/release SW[9] to reset the circuit. Then, press/release SW[8] to initialize
-*   the (x,y) location of the line. The line color is determined by SW[2:0]. Finally, press 
-*   KEY[3] to start the animation. 
+OUR SNAKE GAME!
+karen & tyra
 */
 module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 				VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_CLK, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
@@ -317,8 +314,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             erased: Lyc = 1'b1; 
             hitState: hitEnable = 1'b1;
             G:   begin 
-                // gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
-                gameEnded = hit;
+                gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
+                // gameEnded = hit;
                 end
 
             H:  
