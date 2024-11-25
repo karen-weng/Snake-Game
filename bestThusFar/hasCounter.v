@@ -65,13 +65,10 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     reg eatApple;
 	reg[1:0]found;
 
-    //assign XApple = 8'd30;
-    //assign YApple = 7'd30;
     wire [7:0] XCApple;
     wire [6:0] YCApple;
     reg LxcApple, LycApple, ExcApple, EycApple;
 	 
-    // added
 	reg Xdir;
     reg Ydir;
 	 
@@ -87,18 +84,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire hit;
     reg hitEnable;
 
-    // always @(posedge SW[4] or posedge SW[5]) 
-    //     begin
-    //     if (SW[5]) 
-    //         begin
-    //         currentLength <= 4'b1; // Reset to zero when sw[5] is high
-    //         end 
-    //     else if (currentLength < 4'b1111) 
-    //         begin
-    //         currentLength <= currentLength + 1; // Increment on the posedge of sw[4]
-    //         end
-    // end
-
     wire [3:0] currentLength;
     assign currentLength = 6;
     reg [3:0] drawBodyCount; 
@@ -106,17 +91,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     wire [7 * maxLength * YDIM -1 :0] YSnakeLong;
 	reg [3:0] counter; 
 
-   // assign XSnakeLong = {X0, X1, X2, X3};
- //   assign YSnakeLong = {Y0, Y1, Y2, Y3};
-
     reg Eshift;
-
-    // initial begin
-    //     for (i = 0; i < maxLength; i = i + 1) begin
-    //         XSnakeLong[i * 8 +: 8] = X0 - (i * XDIM); // X coordinates, evenly spaced
-    //         YSnakeLong[i * 7 +: 7] = Y0;             // Same Y coordinate
-    //     end
-    // end
 
     shift_register_move_snake S0 (CLOCK_50, Eshift, SW[5], XSnakeLong, X, XSnakeLong);
         defparam S0.n = 8; 
@@ -151,7 +126,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     UpDn_count U2 (X0, CLOCK_50, SW[9], Ex, ~SW[8], Xdir, X);
         defparam U2.n = 8;
 
-
     UpDn_count U3 (8'd0, CLOCK_50, SW[9], Exc, Lxc, 1'b1, XC);
         defparam U3.n = 8;
     UpDn_count U4 (7'd0, CLOCK_50, SW[9], Eyc, Lyc, 1'b1, YC);
@@ -166,24 +140,17 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
         defparam U5.n = K;
     assign sync = (slow == 0);
 
-
-    // UpDn_count U6 (maxLength, CLOCK_50, SW[9], Ebodycounter, ~SW[8], 1'b0, drawBodyCount);
-    //     defparam U6.n = 2;
-
-    hex7seg D0 (y_Q[0], HEX1);
-    hex7seg D1 (y_Q[1], HEX2);
-    hex7seg D2 (y_Q[2], HEX3);
-    hex7seg D3 (y_Q[3], HEX4);
-    hex7seg D4 (y_Q[4], HEX5);
+    // hex7seg D0 (y_Q[0], HEX1);
+    // hex7seg D1 (y_Q[1], HEX2);
+    // hex7seg D2 (y_Q[2], HEX3);
+    // hex7seg D3 (y_Q[3], HEX4);
+    // hex7seg D4 (y_Q[4], HEX5);
 
     decimal_display a1(counter[3:0], HEX0); 
+
     // movement
     always @ (*)
     begin
-    // if (SW[5]) 
-    //     begin
-    //         move_right = 1'b0; move_down = 1'b0; move_up = 1'b0; move_left = 1'b0;
-    //     end
         // Direction control based on key inputs
     if (~KEY[0]) // Move Right
         begin
@@ -292,13 +259,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                 counter = 1;
                 end
 
-            BBinital:  begin 
+            BBinital:  
+                begin 
 				ExcApple = 1'b1; 
 				VGA_COLOR = 3'b100; 
                 plot = 1'b1; 
 				end // color a pixel
 
-            CCinital:  begin 
+            CCinital:  
+                begin 
 				LxcApple = 1'b1; 
 				EycApple = 1'b1; 
 				end
@@ -309,14 +278,15 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             drawedInital: Lyc = 1'b1;
 
-            waitKey: begin 
+            waitKey: 
+                begin 
                 Lxc = 1'b1; 
                 Lyc = 1'b1; 
                 LxcApple = 1'b1; 
                 LycApple = 1'b1;
                 end
 
-            BB:  begin 
+            BB: begin 
 				ExcApple = 1'b1; 
 				VGA_COLOR = 3'b100; 
                 plot = 1'b1; 
@@ -346,18 +316,14 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 
             erased: Lyc = 1'b1; 
             hitState: hitEnable = 1'b1;
-           G:   begin 
+            G:   begin 
                 // gameEnded = (Y == 7'd0) || (Y == YSCREEN- YDIM)||(X == 8'd0) || (X == XSCREEN- XDIM) || hit;
                 gameEnded = hit;
-
                 end
 
             H:  
             begin
                 LycApple = 1'b1; 
-						 
-         //   if (drawBodyCount == 1)
-                //begin
 
                 if (move_left)
                     begin
@@ -379,15 +345,12 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     Ex = 1'b1;
                     Xdir = 1'b1;
                     end
-                
-				
+                	
                 eatApple = ((X < XApple + XDimApp) && (X + XDIM > XApple)) && ((Y < YApple + YDimApp) && (Y + YDIM > YApple));
-					//eatApple=((Y<YApple&&(Y+YDIM>YApple))||((Y<YApple+7'd4)&&(Y>YApple)))||((X<XApple&&(X+XDIM>XApple))||((X<XApple+8'd4)&&(X>XApple)));
 				if (eatApple)
 					begin
 					found=2'b11; 
 					eatApple=1'b0;
-					//counter
 					if (!gameEnded) counter <= counter + 1;
 					end	
 					
@@ -412,19 +375,17 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 					default: YApple=7'd20; 
 					endcase
 					found=2'b10; 
-					//eatApple=1'b0; 
-			//counter<=counter+1; 
 				    end
+
 				else if (found==2'b00)
 					begin
 					XApple=8'd30; 
 					YApple=7'd30; 
 					found=2'b10; 
 					end
-            end
+                end
 
             shift: Eshift = 1'b1;
-                 //i call my state EndGame and my current length counter   
             endGameState: 
                 begin 
                     plot =1'b1; 
@@ -433,9 +394,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
                     Eyc=(XC==XDIM-1);
                 
                 end
-					
-
-          //  end
         endcase
     end
 
@@ -450,11 +408,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             y_Q <= Y_D;
 				
             if ((y_Q == drawed && Y_D == B) || (y_Q == erased && Y_D == E))
-                begin
-            // if (drawBodyCount >= 1)  
                 drawBodyCount <= drawBodyCount - 1;
-                end
-					 
 					
             else if ( (y_Q == drawed && Y_D == D) || (y_Q == erased && Y_D == hitState))
                 drawBodyCount <= currentLength;
@@ -464,6 +418,7 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
     assign go = SW[7];
 
 
+    // displaying on vga
     reg [7:0] VGA_X_reg, VGA_Y_reg;
 
     always @(*) begin
@@ -479,12 +434,8 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
             end
     end
 
-
     assign VGA_X = (y_Q == BB || y_Q == BBinital) ? (XApple + XCApple) : VGA_X_reg;
     assign VGA_Y = (y_Q == BB || y_Q == BBinital) ? (YApple + YCApple) : VGA_Y_reg;
-
-    // assign VGA_X = X + XC;
-    // assign VGA_Y = Y + YC;
 
     // connect to VGA controller
     vga_adapter VGA (
@@ -508,30 +459,6 @@ module vga_demo(CLOCK_50, SW, KEY, VGA_R, VGA_G, VGA_B,
 		defparam VGA.BACKGROUND_IMAGE = "black.mif"; 
 endmodule
 
-module regn(R, Resetn, E, Clock, Q);
-    parameter n = 8;
-    input [n-1:0] R;
-    input Resetn, E, Clock;
-    output reg [n-1:0] Q;
-
-    always @(posedge Clock)
-        if (!Resetn)
-            Q <= 0;
-        else if (E)
-            Q <= R;
-endmodule
-
-module ToggleFF(T, Resetn, Clock, Q);
-    input T, Resetn, Clock;
-    output reg Q;
-
-    always @(posedge Clock)
-        if (!Resetn)
-            Q <= 0;
-        else if (T)
-            Q <= ~Q;
-endmodule
-
 module UpDn_count (R, Clock, Resetn, E, L, UpDn, Q);
     parameter n = 8;
     input [n-1:0] R;
@@ -548,46 +475,6 @@ module UpDn_count (R, Clock, Resetn, E, L, UpDn, Q);
                 Q <= Q + 1;
             else
                 Q <= Q - 1;
-endmodule
-
-module hex7seg (hex, display);
-    input [3:0] hex;
-    output [6:0] display;
-
-    reg [6:0] display;
-
-    /*
-     *       0  
-     *      ---  
-     *     |   |
-     *    5|   |1
-     *     | 6 |
-     *      ---  
-     *     |   |
-     *    4|   |2
-     *     |   |
-     *      ---  
-     *       3  
-     */
-    always @ (hex)
-        case (hex)
-            4'h0: display = 7'b1000000;
-            4'h1: display = 7'b1111001;
-            4'h2: display = 7'b0100100;
-            4'h3: display = 7'b0110000;
-            4'h4: display = 7'b0011001;
-            4'h5: display = 7'b0010010;
-            4'h6: display = 7'b0000010;
-            4'h7: display = 7'b1111000;
-            4'h8: display = 7'b0000000;
-            4'h9: display = 7'b0011000;
-            4'hA: display = 7'b0001000;
-            4'hB: display = 7'b0000011;
-            4'hC: display = 7'b1000110;
-            4'hD: display = 7'b0100001;
-            4'hE: display = 7'b0000110;
-            4'hF: display = 7'b0001110;
-        endcase
 endmodule
 
 module shift_register_move_snake (clk, enable, reset, data, data_in, data_out);    
@@ -641,25 +528,20 @@ module ifhit (enable, Xhead, Yhead, XSnakeLong, YSnakeLong, currentLength, hit, 
     always @* begin
         if (enable)
         begin
-            hit = 1'b0; // Default: no collision
-            // if (currentLength >= 2)
-            // begin
+            hit = 1'b0; 
 
-            // Loop through all segments of the active snake length
             for (i = 2; i < maxLength; i = i + 1) begin
                 if (i <= currentLength)
                 begin
-                // Check for collisions with each body segment
                 if ((Xhead < XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8] + DIM) && 
                     (Xhead + DIM > XSnakeLong[(maxLength - i) * 8 * DIM - 1 -: 8]) &&
                     (Yhead < YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7] + DIM) && 
-                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) begin
-                    hit = 1'b1; // Collision detected
-                end
+                    (Yhead + DIM > YSnakeLong[(maxLength - i) * 7 * DIM - 1 -: 7])) 
+                    begin
+                    hit = 1'b1; 
+                    end
                 end
             end
-
-            // end
         end
     end 
 endmodule 
@@ -677,3 +559,42 @@ module decimal_display (C, Display);
     assign Display[6] = ~C[3] & ~C[2] & ~C[1] | C[2] & C[1] & C[0];
 endmodule
 
+module hex7seg (hex, display);
+    input [3:0] hex;
+    output [6:0] display;
+
+    reg [6:0] display;
+
+    /*
+     *       0  
+     *      ---  
+     *     |   |
+     *    5|   |1
+     *     | 6 |
+     *      ---  
+     *     |   |
+     *    4|   |2
+     *     |   |
+     *      ---  
+     *       3  
+     */
+    always @ (hex)
+        case (hex)
+            4'h0: display = 7'b1000000;
+            4'h1: display = 7'b1111001;
+            4'h2: display = 7'b0100100;
+            4'h3: display = 7'b0110000;
+            4'h4: display = 7'b0011001;
+            4'h5: display = 7'b0010010;
+            4'h6: display = 7'b0000010;
+            4'h7: display = 7'b1111000;
+            4'h8: display = 7'b0000000;
+            4'h9: display = 7'b0011000;
+            4'hA: display = 7'b0001000;
+            4'hB: display = 7'b0000011;
+            4'hC: display = 7'b1000110;
+            4'hD: display = 7'b0100001;
+            4'hE: display = 7'b0000110;
+            4'hF: display = 7'b0001110;
+        endcase
+endmodule
